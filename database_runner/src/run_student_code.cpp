@@ -1,4 +1,4 @@
-#include "code_runner.h"
+#include "run_student_code.h"
 #include <chrono>
 #include <filesystem>
 #include <fstream>
@@ -6,6 +6,82 @@
 
 namespace fs = std::filesystem;
 
+namespace {
+std::string error(int status) {
+  if (status == 0)
+    return "Успешно :)";
+  if (status > 128) {
+    int signal = status - 128;
+    switch (signal) {
+    case 1:
+      return "Hangup";
+    case 2:
+      return "Interrupt";
+    case 3:
+      return "Quit";
+    case 4:
+      return "Illegal instruction";
+    case 5:
+      return "Trace trap";
+    case 6:
+      return "Abort";
+    case 8:
+      return "Floating point exception";
+    case 9:
+      return "Killed";
+    case 11:
+      return "Segmentation fault";
+    case 13:
+      return "Broken pipe";
+    case 15:
+      return "Terminated";
+    default:
+      return "Сигнал " + std::to_string(signal);
+    }
+  }
+
+  switch (status) {
+  case 1:
+    return "General error";
+  case 2:
+    return "No such file or directory";
+  case 126:
+    return "Command cannot execute";
+  case 127:
+    return "Command not found";
+  case 128:
+    return "Invalid exit argument";
+  default:
+    return "Error code " + std::to_string(status);
+  }
+}
+}
+std::string terminal(std::string command, std::string input = "") {
+  char buffer[128];
+  std::string result = "";
+  std::string full_command;
+  if (!input.empty()) {
+    full_command = "echo '" + input + "' | " + command;
+  } else {
+    full_command = command;
+  }
+  FILE *pipe = popen(full_command.c_str(), "r");
+
+  if (!pipe) {
+    return "ERROR: Failed to run command";
+  }
+
+  while (fgets(buffer, sizeof(buffer), pipe) != NULL) {
+    result += buffer;
+  }
+
+  int status = pclose(pipe);
+  if (status != 0) {
+    result += "\n" + error(status);
+  }
+
+  return result;
+}
 Run_result run_student_code(const std::string &code,
                             const std::vector<Test> &tests) {
   Run_result result;
