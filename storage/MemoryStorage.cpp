@@ -10,7 +10,7 @@ bool MemoryStorage::userExists(const std::string& username){
 
 bool MemoryStorage::addUser(const std::string& username, const std::string& password){
     std::lock_guard<std::mutex> lock(m);
-    if (users.find(username) != users.end()){ // Проверка, нет ли такого пользователя уже в базе
+    if (users.find(username) != users.end()){
         return false;
     }
     users[username] = password;
@@ -20,6 +20,6 @@ bool MemoryStorage::addUser(const std::string& username, const std::string& pass
 bool MemoryStorage::checkPassword(const std::string& username, const std::string& password){
     std::lock_guard<std::mutex> lock(m);
     auto x = users.find(username);
-    if (x == users.end()) return false; // пользователя не существует
+    if (x == users.end()) return false;
     return x -> second == password;
 }
