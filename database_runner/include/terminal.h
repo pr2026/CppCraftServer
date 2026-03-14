@@ -8,5 +8,5 @@ struct Terminal_result {
     int exit_code;
 };
 
-
-Terminal_result terminal(const std::string& command, const std::string& input = "");
+Terminal_result
+terminal(const std::string &command, const std::string &input = "");

@@ -1,5 +1,6 @@
 #include <drogon/drogon.h>
-#include <controllers/UserController.h>
+#include "controllers/UserController.h"
+#include "controllers/TasksController.h"
 
 int main() {
     drogon::app().setLogLevel(trantor::Logger::kTrace)
