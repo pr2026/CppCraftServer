@@ -1,87 +1,17 @@
 #include "run_student_code.h"
+#include "database.h"
+#include "terminal.h"
 #include <chrono>
+#include <iostream>
 #include <filesystem>
 #include <fstream>
 #include <random>
+#include <cstdio>
 
 namespace fs = std::filesystem;
 
-namespace {
-std::string error(int status) {
-  if (status == 0)
-    return "Успешно :)";
-  if (status > 128) {
-    int signal = status - 128;
-    switch (signal) {
-    case 1:
-      return "Hangup";
-    case 2:
-      return "Interrupt";
-    case 3:
-      return "Quit";
-    case 4:
-      return "Illegal instruction";
-    case 5:
-      return "Trace trap";
-    case 6:
-      return "Abort";
-    case 8:
-      return "Floating point exception";
-    case 9:
-      return "Killed";
-    case 11:
-      return "Segmentation fault";
-    case 13:
-      return "Broken pipe";
-    case 15:
-      return "Terminated";
-    default:
-      return "Сигнал " + std::to_string(signal);
-    }
-  }
 
-  switch (status) {
-  case 1:
-    return "General error";
-  case 2:
-    return "No such file or directory";
-  case 126:
-    return "Command cannot execute";
-  case 127:
-    return "Command not found";
-  case 128:
-    return "Invalid exit argument";
-  default:
-    return "Error code " + std::to_string(status);
-  }
-}
-}
-std::string terminal(std::string command, std::string input = "") {
-  char buffer[128];
-  std::string result = "";
-  std::string full_command;
-  if (!input.empty()) {
-    full_command = "echo '" + input + "' | " + command;
-  } else {
-    full_command = command;
-  }
-  FILE *pipe = popen(full_command.c_str(), "r");
 
-  if (!pipe) {
-    return "ERROR: Failed to run command";
-  }
-
-  while (fgets(buffer, sizeof(buffer), pipe) != NULL) {
-    result += buffer;
-  }
-
-  int status = pclose(pipe);
-  if (status != 0) {
-    result += "\n" + error(status);
-  }
-
-  return result;
-}
 Run_result run_student_code(const std::string &code,
                             const std::vector<Test> &tests) {
   Run_result result;
@@ -96,8 +26,12 @@ Run_result run_student_code(const std::string &code,
   std::uniform_int_distribution<> dis(1000, 9999);
   int random_num = dis(gen);
 
-  std::string filename = "/tmp/solution_" + std::to_string(ms) + "_" +
-                         std::to_string(random_num) + ".cpp";
+
+
+
+  std::string unique_id = std::to_string(ms) + "_" + std::to_string(random_num);
+  std::string filename = "/tmp/solution_" + unique_id + ".cpp";
+  std::string executable = "/tmp/solution_" + unique_id;
 
   std::ofstream file(filename);
   if (!file) {
@@ -128,21 +62,20 @@ Run_result run_student_code(const std::string &code,
                                 "--read-only "
                                 "-v /tmp:/workspace "
                                 "-w /workspace "
-                                "silkeh/clang:latest clang++ " +
-                                filename + " -o solution 2>&1";
-
-  std::string compile_result = terminal(compile_command);
-  std::string executable = "/tmp/solution";
-
+                                "arm64v8/gcc:latest g++ /workspace/solution_" +
+                                unique_id + ".cpp -o solution_" + unique_id + " 2>&1";
+  Terminal_result compile_res = terminal(compile_command);
   if (!fs::exists(executable)) {
     result.pass_compile = false;
-    result.compile_error = compile_result;
+    result.compile_error = compile_res.output; 
     fs::remove(filename);
     return result;
   }
+  
+
   result.pass_compile = true;
   result.compile_error = "";
-  std::string run_result = "docker run --rm "
+  std::string run_result = "docker run --rm -i "
                            "--memory=256m "
                            "--cpus=0.5 "
                            "--network=none "
@@ -150,20 +83,33 @@ Run_result run_student_code(const std::string &code,
                            "--stop-timeout=5 "
                            "-v /tmp:/workspace "
                            "-w /workspace "
-                           "silkeh/clang:latest ./solution";
-
+                           "arm64v8/gcc:latest ./solution_" + unique_id;
   result.total_tests = tests.size();
   result.passed_tests = 0;
   std::vector<Test> test_results = tests;
 
   for (int i = 0; i < tests.size(); ++i) {
+    std::cout << "Запуск теста " << i << " с input: '" << tests[i].input << "'" << std::endl;
+    Terminal_result run_res = terminal(run_result, tests[i].input);
+    
+    std::cout << "Вывод программы: '" << run_res.output << "'" << std::endl;
+    if (!run_res.error_msg.empty()) {
+        std::cout << "ОШИБКА: " << run_res.error_msg << std::endl;
+    }
 
-    std::string output = terminal(run_result, tests[i].input);
+    test_results[i].real_output = run_res.output;
 
-    test_results[i].real_output = output;
-    if (output == tests[i].expected_output) {
+    if (run_res.exit_code != 0) {
+    
+      test_results[i].passed = false;
+      test_results[i].real_output += "\n[ОШИБКА: " + run_res.error_msg + "]";
+    } 
+    else if (run_res.output == tests[i].expected_output) {
+    
       test_results[i].passed = true;
-    } else {
+    } 
+    else {
+
       test_results[i].passed = false;
     }
 
@@ -176,5 +122,17 @@ Run_result run_student_code(const std::string &code,
 
   fs::remove(executable);
   fs::remove(filename);
+  Database db("results.db");
+  std::string sql = "INSERT INTO solutions (code, pass_compile, compile_error, total_tests, passed_tests) VALUES ('" +
+                  code + "', " +
+                  std::to_string(result.pass_compile) + ", '" +
+                  result.compile_error + "', " +
+                  std::to_string(result.total_tests) + ", " +
+                  std::to_string(result.passed_tests) + ");";
+  if (db.executeSQL(sql)) {
+            std::cout << "Результат сохранён в БД" << std::endl;
+        } else {
+            std::cerr << "Не удалось сохранить результат в БД" << std::endl;
+        }
   return result;
 }

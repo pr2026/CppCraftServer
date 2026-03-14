@@ -3,12 +3,19 @@
 #include <vector>
 
 int main() {
-  std::string students_kod = "#include <iostream>\nint main() { int a, b; "
-                             "std::cin >> a >> b; std::cout << a + b; }";
-  std::vector<Test> tests = {{"2 3", "5", "", false},
-                             {"10 20", "30", "", false},
-                             {"-5 5", "0", "", false},
-                             {"100 200", "300", "", false}};
+  std::string students_kod = R"(
+#include <iostream>
+int main() {
+    int a, b;
+    if (!(std::cin >> a >> b)) {
+        std::cout << "NO_INPUT";
+        return 1;
+    }
+    std::cout << a + b;
+    return 0;
+}
+)";
+  std::vector<Test> tests = { {"20 22", "42", "", false} };
 
   Run_result result = run_student_code(students_kod, tests);
 
