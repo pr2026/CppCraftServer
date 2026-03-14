@@ -2,7 +2,7 @@
 #include <mutex>
 #include <unordered_map>
 
-void UserController::registration_User(
+void UserController::registrationUser(
     const drogon::HttpRequestPtr &req,
     std::function<void(const drogon::HttpResponsePtr &)> &&callback) {
   auto jsonPTR = req->getJsonObject();
@@ -28,7 +28,7 @@ void UserController::registration_User(
   std::string username = json["username"].asString();
   std::string password = json["password"].asString();
 
-  if (storage_->userExists(username)) {
+  if (storage->userExists(username)) {
     Json::Value result;
     result["error"] = "Username already exists";
     auto result_callback = drogon::HttpResponse::newHttpJsonResponse(result);
@@ -37,7 +37,7 @@ void UserController::registration_User(
     return;
   }
 
-  if (storage_->addUser(username, password)) {
+  if (storage->addUser(username, password)) {
     Json::Value result;
     result["status"] = "OK";
     auto result_callback = drogon::HttpResponse::newHttpJsonResponse(result);
@@ -52,7 +52,7 @@ void UserController::registration_User(
   }
 }
 
-void UserController::login_User(
+void UserController::loginUser(
     const drogon::HttpRequestPtr &req,
     std::function<void(const drogon::HttpResponsePtr &)> &&callback) {
   auto jsonPTR = req->getJsonObject();
@@ -78,7 +78,7 @@ void UserController::login_User(
   std::string username = json["username"].asString();
   std::string password = json["password"].asString();
 
-  if (storage_->checkPassword(username, password)){
+  if (storage->checkPassword(username, password)){
     Json::Value result;
     result["status"] = "OK";
     result["role"] = "student";
