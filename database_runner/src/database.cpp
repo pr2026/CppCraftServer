@@ -1,4 +1,5 @@
 #include "database.h"
+#include <functional>
 #include <iostream>
 
 Database::Database(const std::string &filename) {
@@ -29,4 +30,8 @@ bool Database::execute_SQL(const std::string &sql) {
         return false;
     }
     return true;
+}
+
+long long Database::last_insert_rowid() const {
+    return sqlite3_last_insert_row_id(db);
 }
