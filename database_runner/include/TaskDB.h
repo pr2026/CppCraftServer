@@ -6,10 +6,9 @@
 #include "storage/TaskStorage.h"
 
 class TaskDB : public Database, public TaskStorage {
-
 public:
     using Database::Database;
-    
+
     std::vector<Task> getAllTasks() override;
     std::optional<Task> getTaskById(int id) override;
 

@@ -1,7 +1,7 @@
 #pragma once
 #include <string>
 #include <vector>
-#include "Test.h"
+#include "test.h"
 
 struct Run_result {
     bool pass_compile = false;

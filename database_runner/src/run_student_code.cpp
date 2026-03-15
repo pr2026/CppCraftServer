@@ -1,12 +1,12 @@
 #include "run_student_code.h"
-#include "Unique.h"
-#include "Docker.h"
-#include "saveStudentsCode.h"
-#include "saveCodeToDatabase.h"
-#include "Database.h"
-#include "test.h"
-#include <iostream>
 #include <filesystem>
+#include <iostream>
+#include "Database.h"
+#include "Docker.h"
+#include "Unique.h"
+#include "saveCodeToDatabase.h"
+#include "saveStudentsCode.h"
+#include "test.h"
 
 namespace fs = std::filesystem;
 
@@ -18,17 +18,15 @@ Run_result run_student_code(
 ) {
     Run_result result;
 
-
     // generate unique name
     std::string unique_id = generate_unique_id();
-    
+
     create_temp_file(unique_id, code);
 
     Terminal_result compile_res = compile(unique_id);
 
-
     std::string executable = "/tmp/solution_" + unique_id;
-    //check compile
+    // check compile
     if (!fs::exists(executable)) {
         result.pass_compile = false;
         result.compile_error = compile_res.output;
@@ -39,8 +37,7 @@ Run_result run_student_code(
     result.pass_compile = true;
     result.compile_error = "";
 
-
-    //work with tests
+    // work with tests
     result.total_tests = tests.size();
     result.passed_tests = 0;
     std::vector<Test> test_results = tests;
@@ -74,12 +71,11 @@ Run_result run_student_code(
 
     result.tests_results = test_results;
 
-    
     std::string code_path = save_student_code(user_id, task_id, code);
-    //remove temps
+    // remove temps
     remove_temp_files(unique_id);
-    
-    //save in db
+
+    // save in db
     Database db("cppcraft.db");
     save_result_to_db(db, user_id, task_id, code_path, result);
 
