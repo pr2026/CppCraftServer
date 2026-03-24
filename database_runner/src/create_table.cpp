@@ -1,4 +1,4 @@
-#include "database.h"
+#include "Database.h"
 
 int main() {
     Database db("cppcraft.db");

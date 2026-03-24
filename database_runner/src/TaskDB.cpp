@@ -1,20 +1,17 @@
 #include "TaskDB.h"
 
-int TaskDB::add_task(
-    const std::string &title,
-    const std::string &description,
-    const std::string &difficulty
-) {
+int TaskDB::addTask(const Task &task) {
     std::string sql =
-        "INSERT INTO tasks (title, description, difficulty) VALUES ('" + title +
-        "', '" + description + "', '" + difficulty + "');";
-    if (!execute_SQL(sql)) {  // need to change on smt usefull
+        "INSERT INTO tasks (title, description, difficulty) VALUES ('" +
+        task.title + "', '" + task.description + "', '" + task.difficulty +
+        "');";
+    if (!execute_SQL(sql)) {
         return -1;
     }
-    return sqlite3_last_insert_rowid(db);
+    return last_insert_row_id();
 }
 
-std::vector<Task> TaskDB::get_all_tasks() {
+std::vector<Task> TaskDB::getAllTasks() {
     std::vector<Task> tasks;
     std::string sql = "SELECT id, title, description, difficulty FROM tasks;";
 
@@ -69,7 +66,7 @@ bool TaskDB::updateTask(int id, const Task &task) {
 bool TaskDB::deleteTask(int id) {
     std::string sql =
         "DELETE FROM tasks WHERE id = " + std::to_string(id) + ";";
-    return db.execute_SQL(sql);
+    return execute_SQL(sql);
 }
 
 bool TaskDB::add_test(

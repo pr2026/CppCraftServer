@@ -45,7 +45,7 @@ Run_result run_student_code(
     for (int i = 0; i < tests.size(); ++i) {
         std::cout << "Запуск теста " << i << " с input: '" << tests[i].input
                   << "'" << std::endl;
-        Terminal_result run_res = run(run_result, tests[i].input);
+        Terminal_result run_res = run(unique_id, tests[i].input);
 
         std::cout << "Вывод программы: '" << run_res.output << "'" << std::endl;
         if (!run_res.error_msg.empty()) {

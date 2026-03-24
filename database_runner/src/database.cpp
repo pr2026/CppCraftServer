@@ -1,4 +1,4 @@
-#include "database.h"
+#include "Database.h"
 #include <functional>
 #include <iostream>
 
@@ -32,6 +32,6 @@ bool Database::execute_SQL(const std::string &sql) {
     return true;
 }
 
-long long Database::last_insert_rowid() const {
-    return sqlite3_last_insert_row_id(db);
+long long Database::last_insert_row_id() const {
+    return sqlite3_last_insert_rowid(db);
 }

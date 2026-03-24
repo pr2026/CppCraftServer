@@ -29,23 +29,23 @@ bool UserDB::userExists(const std::string &username) {
     return id.has_value();
 }
 
-int UserDB::add_user(
+bool UserDB::addUser(
     const std::string &username,
     const std::string &password,
     const std::string &role
 ) {
+    if (userExists(username)) {
+        return false;
+    }
     std::string password_h = hash_password(password);
 
     std::string sql = "INSERT INTO users (username, password, role) VALUES ('" +
                       username + "', '" + password_h + "', '" + role + "');";
 
-    if (!execute_SQL(sql)) {
-        return -1;
-    }
-    return sqlite3_last_insert_row_id(db);
+    return execute_SQL(sql);
 }
 
-std::optional<int> UserDB::check_password(
+bool UserDB::checkPassword(
     const std::string &username,
     const std::string &password
 ) {
@@ -59,10 +59,10 @@ std::optional<int> UserDB::check_password(
         return std::nullopt;
     }
 
-    std::optional<int> result = std::nullopt;
+    bool result = false;
 
     if (sqlite3_step(stmt) == SQLITE_ROW) {
-        result = sqlite3_column_int(stmt, 0);
+        result = true;
     }
 
     sqlite3_finalize(stmt);
