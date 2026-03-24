@@ -1,4 +1,4 @@
-#include "database.h"
+#include "Database.h"
 
 int main() {
     Database db("cppcraft.db");
@@ -36,7 +36,7 @@ int main() {
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             user_id INTEGER NOT NULL,
             task_id INTEGER NOT NULL,
-            code TEXT NOT NULL,
+            code_path TEXT NOT NULL,
             pass_compile INTEGER NOT NULL,
             compile_error TEXT,
             total_tests INTEGER NOT NULL,
