@@ -2,12 +2,34 @@
 #include <algorithm>
 
 MemoryTaskStorage::MemoryTaskStorage(){
-    Task t1{next_id++, "Hello World", "Write a program that prints 'Hello, World!'", "easy"};
-    Task t2{next_id++, "Sum of two numbers", "Read two integers and print their sum.", "easy"};
-    Task t3{next_id++, "Factorial", "Compute the factorial of a given number.", "medium"};
-    tasks[t1.id] = t1;
-    tasks[t2.id] = t2;
-    tasks[t3.id] = t3;
+    Task t1;
+    t1.id = nextId_++;
+    t1.title = "Hello World";
+    t1.description = "Write a program that prints 'Hello, World!'";
+    t1.difficulty = "easy";
+    t1.tests = {{"", "Hello, World!"}};
+    tasks_[t1.id] = t1;
+
+    Task t2;
+    t2.id = nextId_++;
+    t2.title = "Sum of two numbers";
+    t2.description = "Read two integers and print their sum.";
+    t2.difficulty = "easy";
+    t2.tests = {
+        {"2 3", "5"},
+        {"10 20", "30"},
+        {"-5 5", "0"},
+        {"100 200", "300"}
+    };
+    tasks_[t2.id] = t2;
+    
+    Task t3;
+    t3.id = nextId_++;
+    t3.title = "Factorial";
+    t3.description = "Compute the factorial of a given number.";
+    t3.difficulty = "medium";
+    t3.tests = {};
+    tasks_[t3.id] = t3;
 }
 
 std::vector<Task> MemoryTaskStorage::getAllTasks(){
