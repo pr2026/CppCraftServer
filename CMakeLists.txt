@@ -45,6 +45,15 @@ aux_source_directory(controllers CTL_SRC)
 aux_source_directory(filters FILTER_SRC)
 aux_source_directory(plugins PLUGIN_SRC)
 aux_source_directory(models MODEL_SRC)
+aux_source_directory(storage STORAGE_SRC)
+
+set(RUNNER_DIR ${CMAKE_CURRENT_SOURCE_DIR}/database_runner)
+set(RUNNER_SRC
+    ${RUNNER_DIR}/src/database.cpp
+    ${RUNNER_DIR}/src/error.cpp
+    ${RUNNER_DIR}/src/run_student_code.cpp
+    ${RUNNER_DIR}/src/terminal.cpp
+)
 
 drogon_create_views(${PROJECT_NAME} ${CMAKE_CURRENT_SOURCE_DIR}/views
                     ${CMAKE_CURRENT_BINARY_DIR})
@@ -58,7 +67,8 @@ drogon_create_views(${PROJECT_NAME} ${CMAKE_CURRENT_SOURCE_DIR}/views
 
 target_include_directories(${PROJECT_NAME}
                            PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}
-                                   ${CMAKE_CURRENT_SOURCE_DIR}/models)
+                                   ${CMAKE_CURRENT_SOURCE_DIR}/models
+                                   ${RUNNER_DIR}/include)
 target_sources(${PROJECT_NAME}
                PRIVATE
                ${SRC_DIR}
@@ -66,8 +76,11 @@ target_sources(${PROJECT_NAME}
                ${FILTER_SRC}
                ${PLUGIN_SRC}
                ${MODEL_SRC}
+               ${STORAGE_SRC} 
+               ${RUNNER_SRC}
                storage/MemoryStorage.cpp
-               storage/MemoryTaskStorage.cpp)
+               storage/MemoryTaskStorage.cpp
+               storage/MemorySubmissionStorage.cpp)
 # ##############################################################################
 # uncomment the following line for dynamically loading views 
 # set_property(TARGET ${PROJECT_NAME} PROPERTY ENABLE_EXPORTS ON)

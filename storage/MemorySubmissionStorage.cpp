@@ -16,7 +16,7 @@ int MemorySubmissionStorage::addSubmission(int userId, int taskId, const std::st
 }
 
 std::optional<Submission> MemorySubmissionStorage::getSubmissionById(int id) {
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::lock_guard<std::mutex> lock(m);
     auto it = submissions.find(id);
     if (it == submissions.end()) return std::nullopt;
     return it->second;

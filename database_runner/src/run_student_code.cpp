@@ -7,13 +7,13 @@
 #include <random>
 #include "database.h"
 #include "terminal.h"
+#include "Run_result.h"
+#include "Test.h"
 
 namespace fs = std::filesystem;
 
-test
 
-    Run_result
-    run_student_code(const std::string &code, const std::vector<Test> &tests) {
+Run_result run_student_code(const std::string &code, const std::vector<Test> &tests) {
     Run_result result;
     // generate unique name
     auto now = std::chrono::system_clock::now();
@@ -61,7 +61,7 @@ test
         "--read-only "
         "-v /tmp:/workspace "
         "-w /workspace "
-        "arm64v8/gcc:latest g++ /workspace/solution_" +
+        "gcc:latest g++ /workspace/solution_" +
         unique_id + ".cpp -o solution_" + unique_id + " 2>&1";
     Terminal_result compile_res = terminal(compile_command);
     if (!fs::exists(executable)) {
@@ -84,7 +84,7 @@ test
         "--stop-timeout=5 "
         "-v /tmp:/workspace "
         "-w /workspace "
-        "arm64v8/gcc:latest ./solution_" +
+        "gcc:latest ./solution_" +
         unique_id;
     result.total_tests = tests.size();
     result.passed_tests = 0;
@@ -130,7 +130,7 @@ test
         code + "', " + std::to_string(result.pass_compile) + ", '" +
         result.compile_error + "', " + std::to_string(result.total_tests) +
         ", " + std::to_string(result.passed_tests) + ");";
-    if (db.executeSQL(sql)) {
+    if (db.execute_SQL(sql)) {
         std::cout << "Результат сохранён в БД" << std::endl;
     } else {
         std::cerr << "Не удалось сохранить результат в БД" << std::endl;
