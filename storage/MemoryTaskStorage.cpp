@@ -3,15 +3,15 @@
 
 MemoryTaskStorage::MemoryTaskStorage(){
     Task t1;
-    t1.id = nextId_++;
+    t1.id = next_id++;
     t1.title = "Hello World";
     t1.description = "Write a program that prints 'Hello, World!'";
     t1.difficulty = "easy";
     t1.tests = {{"", "Hello, World!"}};
-    tasks_[t1.id] = t1;
+    tasks[t1.id] = t1;
 
     Task t2;
-    t2.id = nextId_++;
+    t2.id = next_id++;
     t2.title = "Sum of two numbers";
     t2.description = "Read two integers and print their sum.";
     t2.difficulty = "easy";
@@ -21,15 +21,15 @@ MemoryTaskStorage::MemoryTaskStorage(){
         {"-5 5", "0"},
         {"100 200", "300"}
     };
-    tasks_[t2.id] = t2;
+    tasks[t2.id] = t2;
     
     Task t3;
-    t3.id = nextId_++;
+    t3.id = next_id++;
     t3.title = "Factorial";
     t3.description = "Compute the factorial of a given number.";
     t3.difficulty = "medium";
     t3.tests = {};
-    tasks_[t3.id] = t3;
+    tasks[t3.id] = t3;
 }
 
 std::vector<Task> MemoryTaskStorage::getAllTasks(){
