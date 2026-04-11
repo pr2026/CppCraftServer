@@ -3,11 +3,17 @@
 #include <vector>
 #include <optional>
 
+struct TestCase{
+    std::string input;
+    std::string expected_output;
+}
+
 struct Task{
     int id;
     std::string title;
     std::string description;
     std::string difficulty;
+    std::vector<TestCase> tests; // list of tests for the task
 
     bool operator<(const Task& other) const { return id < other.id; }
 };
