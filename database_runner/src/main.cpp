@@ -1,8 +1,34 @@
 #include <iostream>
 #include <vector>
+#include "Database.h"
+#include "TaskDB.h"
+#include "UserDB.h"
 #include "run_student_code.h"
 
 int main() {
+    UserDB users("cppcraft.db");
+    TaskDB tasks("cppcraft.db");
+
+    int user_id = users.addUser("alice", "123", "student");
+    if (user_id != -1) {
+        std::cout << "Пользователь alice создан с ID: " << user_id << std::endl;
+    } else {
+        std::cout << "Пользователь уже существует" << std::endl;
+    }
+
+    bool login = users.checkPassword("alice", "123");
+    if (login) {
+        std::cout << "Вы вошли!" << std::endl;
+    } else {
+        std::cout << "Неверный пароль" << std::endl;
+    }
+
+    int task_id = tasks.addTask("Сумма чисел", "Сложи два числа", "easy");
+    std::cout << "Создана задача с ID: " << task_id << std::endl;
+
+    tasks.addTest(task_id, "20 22", "42");
+    std::cout << "Добавлен тест" << std::endl;
+
     std::string students_kod = R"(
 #include <iostream>
 int main() {
@@ -15,9 +41,8 @@ int main() {
     return 0;
 }
 )";
-    std::vector<Test> tests = {{"20 22", "42", "", false}};
-
-    Run_result result = run_student_code(students_kod, tests);
+    auto tests = tasks.getTestsForTask(task_id);
+    Run_result result = run_student_code(user_id, task_id, students_kod, tests);
 
     if (!result.pass_compile) {
         std::cout << "COMPILATION ERROR:\n"
