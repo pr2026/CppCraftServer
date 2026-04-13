@@ -2,8 +2,8 @@
 
 #include <string>
 #include <vector>
-#include "run_result.h"
-#include "test.h"
+#include "RunResult.h"
+#include "Test.h"
 
 Run_result run_student_code(
     int user_id,

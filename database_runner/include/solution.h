@@ -1,6 +1,6 @@
 #pragma once
 #include <string>
-#include "run_result.h"
+#include "RunResult.h"
 
 struct Solution {
     int id;

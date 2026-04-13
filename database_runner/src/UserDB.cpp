@@ -1,7 +1,7 @@
 #include "UserDB.h"
 #include <functional>
 
-std::string hash_password(const std::string &password) {
+std::string UserDB::hash_password(const std::string &password) {
     std::hash<std::string> hasher;
     return std::to_string(hasher(password));
 }
@@ -29,20 +29,28 @@ bool UserDB::userExists(const std::string &username) {
     return id.has_value();
 }
 
-bool UserDB::addUser(
+// need change
+bool UserDB::addUser(const std::string &username, const std::string &password) {
+    return addUser(username, password, "student");
+}
+
+//
+int UserDB::addUser(
     const std::string &username,
     const std::string &password,
     const std::string &role
 ) {
     if (userExists(username)) {
-        return false;
+        return -1;
     }
     std::string password_h = hash_password(password);
 
     std::string sql = "INSERT INTO users (username, password, role) VALUES ('" +
                       username + "', '" + password_h + "', '" + role + "');";
-
-    return execute_SQL(sql);
+    if (!execute_SQL(sql)) {
+        return -1;
+    }
+    return last_insert_row_id();
 }
 
 bool UserDB::checkPassword(
@@ -56,15 +64,10 @@ bool UserDB::checkPassword(
 
     sqlite3_stmt *stmt;
     if (sqlite3_prepare_v2(db, sql.c_str(), -1, &stmt, nullptr) != SQLITE_OK) {
-        return std::nullopt;
+        return false;
     }
 
-    bool result = false;
-
-    if (sqlite3_step(stmt) == SQLITE_ROW) {
-        result = true;
-    }
-
+    bool result = (sqlite3_step(stmt) == SQLITE_ROW);
     sqlite3_finalize(stmt);
     return result;
 }

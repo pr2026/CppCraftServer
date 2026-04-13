@@ -3,10 +3,10 @@
 #include <iostream>
 #include "Database.h"
 #include "Docker.h"
+#include "Test.h"
 #include "Unique.h"
 #include "saveCodeToDatabase.h"
 #include "saveStudentsCode.h"
-#include "test.h"
 
 namespace fs = std::filesystem;
 
@@ -16,28 +16,26 @@ Run_result run_student_code(
     const std::string &code,
     const std::vector<Test> &tests
 ) {
-    Run_result result;
+    Run_result result;  // output our solve
 
-    // generate unique name
-    std::string unique_id = generate_unique_id();
+    std::string unique_id = GenerateUniqueId();
 
-    create_temp_file(unique_id, code);    //
+    CreateTempFile(unique_id, code);  // realse in docker.h
 
     Terminal_result compile_res = compile(unique_id);
 
     std::string executable = "/tmp/solution_" + unique_id;
-    // check compile
     if (!fs::exists(executable)) {
         result.pass_compile = false;
-        result.compile_error = compile_res.output;
-        remove_temp_files(unique_id);
+        result.compile_error = compile_res.output;  // its output from terminal
+        RemoveTempFiles(unique_id);
         return result;
     }
 
     result.pass_compile = true;
     result.compile_error = "";
 
-    // work with tests
+    // tests
     result.total_tests = tests.size();
     result.passed_tests = 0;
     std::vector<Test> test_results = tests;
@@ -48,9 +46,6 @@ Run_result run_student_code(
         Terminal_result run_res = run(unique_id, tests[i].input);
 
         std::cout << "Вывод программы: '" << run_res.output << "'" << std::endl;
-        if (!run_res.error_msg.empty()) {
-            std::cout << "ОШИБКА: " << run_res.error_msg << std::endl;
-        }
 
         test_results[i].real_output = run_res.output;
 
@@ -70,10 +65,8 @@ Run_result run_student_code(
     }
 
     result.tests_results = test_results;
-
-    std::string code_path = save_student_code(user_id, task_id, code);
-    // remove temps
-    remove_temp_files(unique_id);
+    std::string code_path = SaveStudentCode(user_id, task_id, code);
+    RemoveTempFiles(unique_id);
 
     // save in db
     Database db("cppcraft.db");

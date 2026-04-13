@@ -2,17 +2,17 @@
 #include <filesystem>
 #include <fstream>
 #include <string>
-#include "terminal.h"
+#include "Terminal.h"
 
 inline void
-create_temp_file(const std::string &unique_id, const std::string &code) {
-    std::string path = "/tmp/solution_" + unique_id + ".cpp";   //way to file
+CreateTempFile(const std::string &unique_id, const std::string &code) {
+    std::string path = "/tmp/solution_" + unique_id + ".cpp";  // way to file
     std::ofstream file(path);
     file << code;
     file.close();
 }
 
-inline void remove_temp_files(const std::string &unique_id) {
+inline void RemoveTempFiles(const std::string &unique_id) {
     std::filesystem::remove("/tmp/solution_" + unique_id + ".cpp");
     std::filesystem::remove("/tmp/solution_" + unique_id);
 }

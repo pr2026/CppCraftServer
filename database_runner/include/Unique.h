@@ -3,7 +3,7 @@
 #include <random>
 #include <string>
 
-inline std::string generate_unique_id() {
+inline std::string GenerateUniqueId() {
     auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(
                   std::chrono::system_clock::now().time_since_epoch()
     )

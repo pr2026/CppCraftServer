@@ -11,8 +11,16 @@ public:
     using Database::Database;
 
     bool userExists(const std::string &username) override;
+
+    // need change just for this night
     bool addUser(const std::string &username, const std::string &password)
         override;
+    //
+    int addUser(
+        const std::string &username,
+        const std::string &password,
+        const std::string &role = "student"
+    );
     bool checkPassword(const std::string &username, const std::string &password)
         override;
 };

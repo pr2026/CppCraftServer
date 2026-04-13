@@ -1,14 +1,21 @@
 #include "TaskDB.h"
 
-int TaskDB::addTask(const Task &task) {
+int TaskDB::addTask(
+    const std::string &title,
+    const std::string &description,
+    const std::string &difficulty
+) {
     std::string sql =
-        "INSERT INTO tasks (title, description, difficulty) VALUES ('" +
-        task.title + "', '" + task.description + "', '" + task.difficulty +
-        "');";
+        "INSERT INTO tasks (title, description, difficulty) VALUES ('" + title +
+        "', '" + description + "', '" + difficulty + "');";
     if (!execute_SQL(sql)) {
         return -1;
     }
     return last_insert_row_id();
+}
+
+int TaskDB::addTask(const Task &task) {
+    return addTask(task.title, task.description, task.difficulty);
 }
 
 std::vector<Task> TaskDB::getAllTasks() {
@@ -32,7 +39,7 @@ std::vector<Task> TaskDB::getAllTasks() {
     return tasks;
 }
 
-std::optional<Task> TaskDB::get_task_by_id(int id) {
+std::optional<Task> TaskDB::getTaskById(int id) {
     std::optional<Task> result = std::nullopt;
 
     std::string sql =
@@ -69,7 +76,7 @@ bool TaskDB::deleteTask(int id) {
     return execute_SQL(sql);
 }
 
-bool TaskDB::add_test(
+bool TaskDB::addTest(
     int task_id,
     const std::string &input,
     const std::string &expected
@@ -81,7 +88,7 @@ bool TaskDB::add_test(
     return execute_SQL(sql);
 }
 
-std::vector<Test> TaskDB::get_tests_for_task(int task_id) {
+std::vector<Test> TaskDB::getTestsForTask(int task_id) {
     std::vector<Test> tests;
 
     std::string sql =

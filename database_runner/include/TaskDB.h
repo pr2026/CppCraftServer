@@ -2,6 +2,7 @@
 #include <optional>
 #include <vector>
 #include "Database.h"
+#include "Test.h"
 #include "storage/TaskStorage.h"
 
 class TaskDB : public Database, public TaskStorage {
@@ -13,11 +14,13 @@ public:
 
     bool updateTask(int id, const Task &task) override;
     bool deleteTask(int id) override;
-
+    int addTask(const Task &task) override;
     int addTask(
         const std::string &title,
         const std::string &description,
         const std::string &difficulty = "easy"
-    ) ;
-    std::optional<Task> get_task_by_id(int id);
+    );
+    std::vector<Test> getTestsForTask(int task_id);
+    bool
+    addTest(int task_id, const std::string &input, const std::string &expected);
 };

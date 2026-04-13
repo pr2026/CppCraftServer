@@ -1,7 +1,7 @@
 #pragma once
 #include <string>
 #include "Database.h"
-#include "run_result.h"
+#include "RunResult.h"
 
 inline bool save_result_to_db(
     Database &db,
@@ -11,7 +11,7 @@ inline bool save_result_to_db(
     const Run_result &result
 ) {
     std::string sql =
-        "INSERT INTO solutions (user_id, task_id, code, pass_compile, "
+        "INSERT INTO solutions (user_id, task_id, code_path, pass_compile, "
         "compile_error, total_tests, passed_tests) VALUES (" +
         std::to_string(user_id) + ", " + std::to_string(task_id) + ", '" +
         code_path + "', " + std::to_string(result.pass_compile) + ", '" +

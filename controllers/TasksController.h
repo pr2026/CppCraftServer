@@ -1,19 +1,29 @@
 #pragma once
 #include <drogon/drogon.h>
-#include "storage/TaskStorage.h"
-#include "storage/MemoryTaskStorage.h"
 #include <memory>
+#include "storage/MemoryTaskStorage.h"
+#include "storage/TaskStorage.h"
 
-class TasksController: public drogon::HttpController<TasksController>
-{
-  public:
-    TasksController() : taskStorage(std::make_unique<MemoryTaskStorage>()) {}
-    void getTasks(const drogon::HttpRequestPtr& req, std::function<void (const drogon::HttpResponsePtr &)> &&callback);
+class TasksController : public drogon::HttpController<TasksController> {
+public:
+    TasksController() : taskStorage(std::make_unique<MemoryTaskStorage>()) {
+    }
+
+    void getTasks(
+        const drogon::HttpRequestPtr &req,
+        std::function<void(const drogon::HttpResponsePtr &)> &&callback
+    );
+    void getTask(
+        const drogon::HttpRequestPtr &req,
+        std::function<void(const drogon::HttpResponsePtr &)> &&callback,
+        int taskId
+    );
 
     METHOD_LIST_BEGIN
-      ADD_METHOD_TO(TasksController::getTasks, "/tasks", drogon::Get);
+    ADD_METHOD_TO(TasksController::getTasks, "/tasks", drogon::Get);
+    ADD_METHOD_TO(TasksController::getTask, "/tasks/{task-id}", drogon::Get);
     METHOD_LIST_END
 
-  private:
+private:
     std::unique_ptr<TaskStorage> taskStorage;
 };

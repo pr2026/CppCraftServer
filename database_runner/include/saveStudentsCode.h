@@ -8,7 +8,7 @@
 namespace fs = std::filesystem;
 
 inline std::string
-save_student_code(int user_id, int task_id, const std::string &code) {
+SaveStudentCode(int user_id, int task_id, const std::string &code) {
     // create folder
     if (!fs::exists("student_codes")) {
         fs::create_directory("student_codes");
@@ -16,7 +16,7 @@ save_student_code(int user_id, int task_id, const std::string &code) {
     // generate unique name
     std::string filename = "student_codes/user_" + std::to_string(user_id) +
                            "_task_" + std::to_string(task_id) + "_" +
-                           generate_unique_id() + ".cpp";
+                           GenerateUniqueId() + ".cpp";
     // save code
     std::ofstream file(filename);
     file << code;
