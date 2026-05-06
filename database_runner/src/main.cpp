@@ -4,6 +4,7 @@
 #include "TaskDB.h"
 #include "UserDB.h"
 #include "run_student_code.h"
+#include "StatisticsDB.h"
 
 int main() {
     UserDB users("cppcraft.db");
