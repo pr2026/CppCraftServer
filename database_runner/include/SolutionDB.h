@@ -20,7 +20,6 @@ struct Solution {
 
 class SolutionDB : public Database {
 public:
-<<<<<<< HEAD
     using Database::Database;
     bool addSolution(
         int user_id,
