@@ -27,7 +27,11 @@ inline Terminal_result compile(const std::string &unique_id) {
         "--read-only "
         "-v /tmp:/workspace "
         "-w /workspace "
+        #ifdef __APPLE__
         "arm64v8/gcc:latest g++ /workspace/solution_" +
+        #else
+        "gcc:latest g++ /workspace/solution_" +
+        #endif
         unique_id + ".cpp -o solution_" + unique_id + " 2>&1";
 
     return terminal(compile_command);
@@ -44,7 +48,11 @@ run(const std::string &unique_id, const std::string &input) {
         "--stop-timeout=5 "
         "-v /tmp:/workspace "
         "-w /workspace "
+        #ifdef __APPLE__
         "arm64v8/gcc:latest ./solution_" +
+        #else
+        "gcc:latest ./solution_" +
+        #endif
         unique_id;
     return terminal(run_result, input);
 }
