@@ -5,10 +5,13 @@
 #include "UserDB.h"
 #include "run_student_code.h"
 #include "StatisticsDB.h"
+#include "SolutionDB.h" 
+#include "saveStudentsCode.h" 
 
 int main() {
     UserDB users("cppcraft.db");
     TaskDB tasks("cppcraft.db");
+    SolutionDB solutions("cppcraft.db"); 
 
     int user_id = users.addUser("alice", "123", "student");
     if (user_id != -1) {
@@ -75,4 +78,25 @@ int main() {
     } else {
         std::cout << "Some tests failed.\n";
     }
+
+    //save solutions 
+
+    std::string code_path = save_student_code(user_id, task_id, students_kod);
+    if (solutions.addSolution(user_id, task_id, code_path, result)) {
+        std::cout << "\nРешение сохранено в БД" << std::endl;
+    } else {
+        std::cerr << "Ошибка сохранения решения" << std::endl;
+    }
+
+    std::cout << "\n=== ИСТОРИЯ РЕШЕНИЙ ===\n";
+    auto history = solutions.getSolutionsForUser(user_id);
+    for (const auto& sol : history) {
+        std::cout << "Решение #" << sol.id << ": задача " << sol.task_id << " → " << sol.result.passed_tests << "/" << sol.result.total_tests;
+        if (sol.result.passed_tests == sol.result.total_tests) {
+            std::cout << "done";
+        }
+        std::cout << std::endl;
+    }
+
+    return 0;
 }
