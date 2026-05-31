@@ -50,7 +50,7 @@ void SubmissionController::submitSolution(
         runnerTests.push_back(t);
     }
     std::cout << "2. Before calling runner" << std::endl;
-    Run_result runnerResult = run_student_code(code, runnerTests);
+    Run_result runnerResult = run_student_code(userId, taskId, code, runnerTests);
     std::cout << "3. After runner" << std::endl;
 
     SubmissionResult subResult;

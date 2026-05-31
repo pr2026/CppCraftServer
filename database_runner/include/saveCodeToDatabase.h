@@ -1,6 +1,6 @@
 #pragma once
 #include <string>
-#include "Database.h"
+#include "database.h"
 #include "RunResult.h"
 
 inline bool save_result_to_db(

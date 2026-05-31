@@ -1,8 +1,8 @@
-#include "Terminal.h"
+#include "terminal.h"
 #include <sys/wait.h>
 #include <cstdio>
 #include <string>
-#include "Error.h"
+#include "error.h"
 
 Terminal_result terminal(const std::string &command, const std::string &input) {
     char buffer[128];
