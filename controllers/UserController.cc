@@ -1,6 +1,7 @@
 #include "UserController.h"
 #include <mutex>
 #include <unordered_map>
+#include "storage/Storage.h"
 
 void UserController::registrationUser(
     const drogon::HttpRequestPtr &req,

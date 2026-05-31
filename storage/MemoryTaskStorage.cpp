@@ -51,14 +51,14 @@ std::optional<Task> MemoryTaskStorage::getTaskById(int id){
     return x->second;
 }
 
-int MemoryTaskStorage::addTask(const Task& task){
-    std::lock_guard<std::mutex> lock(m);
-    int new_id = next_id++; // first we assign a value, then we increase next_id
-    Task new_task = task;
-    new_task.id = new_id;
-    tasks[new_id] = new_task;
-    return new_id;
-}
+// int MemoryTaskStorage::addTask(const Task& task){
+//     std::lock_guard<std::mutex> lock(m);
+//     int new_id = next_id++; // first we assign a value, then we increase next_id
+//     Task new_task = task;
+//     new_task.id = new_id;
+//     tasks[new_id] = new_task;
+//     return new_id;
+// }
 
 bool MemoryTaskStorage::updateTask(int id, const Task& task){
     std::lock_guard<std::mutex> lock(m);
@@ -76,4 +76,13 @@ bool MemoryTaskStorage::updateTask(int id, const Task& task){
 bool MemoryTaskStorage::deleteTask(int id){
     std::lock_guard<std::mutex> lock(m);
     return tasks.erase(id) > 0;
+}
+
+int MemoryTaskStorage::addTask(const Task& task) {
+    std::lock_guard<std::mutex> lock(m);
+    int new_id = next_id++;
+    Task newTask = task;
+    newTask.id = new_id;
+    tasks[new_id] = newTask;
+    return new_id;
 }

@@ -19,9 +19,13 @@ public:
         int taskId
     );
 
+    void createTask(const drogon::HttpRequestPtr& req,
+                std::function<void(const drogon::HttpResponsePtr&)>&& callback);
+
     METHOD_LIST_BEGIN
     ADD_METHOD_TO(TasksController::getTasks, "/tasks", drogon::Get);
     ADD_METHOD_TO(TasksController::getTask, "/tasks/{task-id}", drogon::Get);
+    ADD_METHOD_TO(TasksController::createTask, "/tasks", drogon::Post);
     METHOD_LIST_END
 
 private:
