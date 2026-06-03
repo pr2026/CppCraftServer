@@ -117,6 +117,16 @@ void TasksController::createTask(const drogon::HttpRequestPtr& req, std::functio
     ret["task_id"] = taskId;
     auto resp = drogon::HttpResponse::newHttpJsonResponse(ret);
     callback(resp);
+
+    if (json.isMember("tests") && json["tests"].isArray()){
+        for (const auto& test: json["tests"]){
+            if (test.isMember("input") && test.isMember("expected_output")){
+                std::string input = test["input"].asString();
+                std::string expected = test["expected_output"].asString();
+                taskStorage->addTest(taskId, input, expected);
+            }
+        }
+    }
 }
 
 void TasksController::deleteTask(const drogon::HttpRequestPtr &req,
@@ -148,7 +158,7 @@ void TasksController::deleteTask(const drogon::HttpRequestPtr &req,
     std::string role = userStorage.getUserRole(username);
     if (role != "teacher") {
         Json::Value ret;
-        ret["error"] = "Access denied. Only teachers can create tasks.";
+        ret["error"] = "Access denied. Only teachers can delete tasks.";
         auto resp = drogon::HttpResponse::newHttpJsonResponse(ret);
         resp->setStatusCode(drogon::k403Forbidden);
         callback(resp);
@@ -158,7 +168,7 @@ void TasksController::deleteTask(const drogon::HttpRequestPtr &req,
     bool deleted = taskStorage->deleteTask(taskId);
     if (!deleted){
         Json::Value ret;
-        ret["error"] = "Access denied. Only teachers can create tasks.";
+        ret["error"] = "Task not found";
         auto resp = drogon::HttpResponse::newHttpJsonResponse(ret);
         resp->setStatusCode(drogon::k404NotFound);
         callback(resp);

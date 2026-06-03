@@ -14,6 +14,7 @@ struct Task {
     std::string description;
     std::string difficulty;
     std::vector<TestCase> tests;  // list of tests for the task
+    int ownerId;
 
     bool operator<(const Task &other) const {
         return id < other.id;
@@ -28,4 +29,5 @@ public:
     virtual int addTask(const Task &task) = 0;
     virtual bool updateTask(int id, const Task &task) = 0;
     virtual bool deleteTask(int id) = 0;
+    virtual bool addTest(int id, const std::string& input, const std::string& expected_outpu) = 0;
 };

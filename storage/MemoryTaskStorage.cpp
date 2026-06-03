@@ -85,3 +85,14 @@ int MemoryTaskStorage::addTask(const Task& task) {
     tasks[new_id] = newTask;
     return new_id;
 }
+
+bool MemoryTaskStorage::addTest(int taskId, const std::string& input, const std::string& expected_output){
+    std::lock_guard<std::mutex> lock(m);
+    auto it = tasks.find(taskId);
+    if (it == tasks.end()) return false;
+    TestCase tc;
+    tc.input = input;
+    tc.expected_output = expected_output;
+    it->second.tests.push_back(tc);
+    return true;
+}
