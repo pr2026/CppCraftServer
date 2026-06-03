@@ -66,7 +66,6 @@ bool MemoryTaskStorage::updateTask(int id, const Task& task){
     if (x == tasks.end()){
         return false;
     }
-    // next, we update the fields, except for the id, it does not change
     x->second.title = task.title;
     x->second.description = task.description;
     x->second.difficulty = task.difficulty;

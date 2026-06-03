@@ -9,9 +9,9 @@ public:
 
     std::vector<Task> getAllTasks() override;
     std::optional<Task> getTaskById(int id) override;
-    bool updateTask(int id, const Task &task) override;
-    bool deleteTask(int id) override;
-    int addTask(const Task& task);
+    bool updateTask(int id, const Task &task) override; // for teachers
+    bool deleteTask(int id) override; // for teachers
+    int addTask(const Task& task); // for teachers
 
 private:
     std::unordered_map<int, Task> tasks;

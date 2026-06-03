@@ -118,3 +118,56 @@ void TasksController::createTask(const drogon::HttpRequestPtr& req, std::functio
     auto resp = drogon::HttpResponse::newHttpJsonResponse(ret);
     callback(resp);
 }
+
+void TasksController::deleteTask(const drogon::HttpRequestPtr &req,
+        std::function<void(const drogon::HttpResponsePtr &)> &&callback,
+        int taskId){
+    auto jsonPtr = req->getJsonObject();
+    if (!jsonPtr) {
+        Json::Value ret;
+        ret["error"] = "Invalid JSON";
+        auto resp = drogon::HttpResponse::newHttpJsonResponse(ret);
+        resp->setStatusCode(drogon::k400BadRequest);
+        callback(resp);
+        return;
+    }
+
+    auto& json = *jsonPtr;
+
+    if (!json.isMember("username")) {
+        Json::Value ret;
+        ret["error"] = "Missing username";
+        auto resp = drogon::HttpResponse::newHttpJsonResponse(ret);
+        resp->setStatusCode(drogon::k400BadRequest);
+        callback(resp);
+        return;
+    }
+    std::string username = json["username"].asString();
+
+    MemoryStorage userStorage;
+    std::string role = userStorage.getUserRole(username);
+    if (role != "teacher") {
+        Json::Value ret;
+        ret["error"] = "Access denied. Only teachers can create tasks.";
+        auto resp = drogon::HttpResponse::newHttpJsonResponse(ret);
+        resp->setStatusCode(drogon::k403Forbidden);
+        callback(resp);
+        return;
+    }
+
+    bool deleted = taskStorage->deleteTask(taskId);
+    if (!deleted){
+        Json::Value ret;
+        ret["error"] = "Access denied. Only teachers can create tasks.";
+        auto resp = drogon::HttpResponse::newHttpJsonResponse(ret);
+        resp->setStatusCode(drogon::k404NotFound);
+        callback(resp);
+        return;
+    }
+
+    Json::Value ret;
+    ret["status"] = "ok";
+    ret["task_id"] = taskId;
+    auto resp = drogon::HttpResponse::newHttpJsonResponse(ret);
+    callback(resp);
+}
