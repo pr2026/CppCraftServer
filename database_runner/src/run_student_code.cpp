@@ -7,6 +7,7 @@
 #include "Unique.h"
 #include "saveCodeToDatabase.h"
 #include "saveStudentsCode.h"
+#include "CompileErrorParser.h"
 
 namespace fs = std::filesystem;
 
