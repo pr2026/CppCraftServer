@@ -1,4 +1,4 @@
-#include "error.h"
+#include "Error.h"
 
 std::string error(int status) {
     if (status == 0) {

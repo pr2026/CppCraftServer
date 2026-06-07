@@ -29,7 +29,7 @@ UserStatistics StatisticsDB::getUserStatistics(int user_id) {
     }
     sqlite3_finalize(stmt);
     std::string sql_per_task =
-        "SELECT task_id, "
+        "SELECT task_id, t.title, "
         "COUNT(*) as attempts, "
         "MAX(passed_tests) as best, "
         "MAX(total_tests) as total_tests "
@@ -42,11 +42,11 @@ UserStatistics StatisticsDB::getUserStatistics(int user_id) {
         while (sqlite3_step(stmt) == SQLITE_ROW) {
             TaskStatistics task_stat;
             task_stat.task_id = sqlite3_column_int(stmt, 0);
-            task_stat.attempt = sqlite3_column_int(stmt, 1);
-            task_stat.best_result = sqlite3_column_int(stmt, 2);
-            task_stat.total_tests = sqlite3_column_int(stmt, 3);
-            task_stat.is_solved =
-                (task_stat.best_result == task_stat.total_tests);
+            task_stat.task_title = (const char*)sqlite3_column_text(stmt, 1);
+            task_stat.attempt = sqlite3_column_int(stmt, 2); 
+            task_stat.best_result = sqlite3_column_int(stmt, 3);
+            task_stat.total_tests = sqlite3_column_int(stmt, 4);
+            task_stat.is_solved = (task_stat.best_result == task_stat.total_tests);
             stats.per_task.push_back(task_stat);
         }
     }

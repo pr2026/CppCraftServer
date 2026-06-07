@@ -29,28 +29,26 @@ bool UserDB::userExists(const std::string &username) {
     return id.has_value();
 }
 
-// need change
-bool UserDB::addUser(const std::string &username, const std::string &password) {
-    return addUser(username, password, "student");
-}
 
-//
-int UserDB::addUser(
+
+
+
+bool UserDB::addUser(
     const std::string &username,
     const std::string &password,
     const std::string &role
 ) {
     if (userExists(username)) {
-        return -1;
+        return false;
     }
     std::string password_h = hash_password(password);
 
     std::string sql = "INSERT INTO users (username, password, role) VALUES ('" +
                       username + "', '" + password_h + "', '" + role + "');";
     if (!execute_SQL(sql)) {
-        return -1;
+        return false;
     }
-    return last_insert_row_id();
+    return true;
 }
 
 bool UserDB::checkPassword(
@@ -58,7 +56,6 @@ bool UserDB::checkPassword(
     const std::string &password
 ) {
     std::string password_h = hash_password(password);
-
     std::string sql = "SELECT id FROM users WHERE username = '" + username +
                       "' AND password = '" + password_h + "';";
 
@@ -70,4 +67,10 @@ bool UserDB::checkPassword(
     bool result = (sqlite3_step(stmt) == SQLITE_ROW);
     sqlite3_finalize(stmt);
     return result;
+}
+
+std::string UserDB::getUserRole(const std::string& username) {
+    auto id = get_user_id(username);
+    if (!id.has_value()) return "";
+    return "student";
 }
