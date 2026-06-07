@@ -3,11 +3,12 @@
 int TaskDB::addTask(
     const std::string &title,
     const std::string &description,
-    const std::string &difficulty
+    const std::string &difficulty,
+    int created_by
 ) {
     std::string sql =
-        "INSERT INTO tasks (title, description, difficulty) VALUES ('" + title +
-        "', '" + description + "', '" + difficulty + "');";
+        "INSERT INTO tasks (title, description, difficulty, created_by) VALUES ('" + title +
+        "', '" + description + "', '" + difficulty + "', " + std::to_string(created_by)+ "');";
     if (!execute_SQL(sql)) {
         return -1;
     }
@@ -15,7 +16,7 @@ int TaskDB::addTask(
 }
 
 int TaskDB::addTask(const Task &task) {
-    return addTask(task.title, task.description, task.difficulty);
+    return addTask(task.title, task.description, task.difficulty, task.created_by);
 }
 
 std::vector<Task> TaskDB::getAllTasks() {
@@ -62,7 +63,11 @@ std::optional<Task> TaskDB::getTaskById(int id) {
     return result;
 }
 
-bool TaskDB::updateTask(int id, const Task &task) {
+bool TaskDB::updateTask(int id, const Task &task, int user_id) {
+    auto owner = getTaskOwner(id);
+    if (!owner.has_value() || owner.value() != user_id) {
+        return false; 
+    }
     std::string sql = "UPDATE tasks SET title = '" + task.title +
                       "', description = '" + task.description +
                       "', difficulty = '" + task.difficulty +
@@ -70,7 +75,11 @@ bool TaskDB::updateTask(int id, const Task &task) {
     return execute_SQL(sql);
 }
 
-bool TaskDB::deleteTask(int id) {
+bool TaskDB::deleteTask(int id, int user_id) {
+    auto owner = getTaskOwner(id);
+    if (!owner.has_value() || owner.value() != user_id) {
+        return false;
+    }
     std::string sql =
         "DELETE FROM tasks WHERE id = " + std::to_string(id) + ";";
     return execute_SQL(sql);
@@ -111,4 +120,17 @@ std::vector<Test> TaskDB::getTestsForTask(int task_id) {
 
     sqlite3_finalize(stmt);
     return tests;
+}
+std::optional<int> TaskDB::getTaskOwner(int task_id) {
+    std::string sql = "SELECT created_by FROM tasks WHERE id = " + std::to_string(task_id) + ";";
+    sqlite3_stmt* stmt;
+    if (sqlite3_prepare_v2(db, sql.c_str(), -1, &stmt, nullptr) != SQLITE_OK) {
+        return std::nullopt;
+    }
+    std::optional<int> owner = std::nullopt;
+    if (sqlite3_step(stmt) == SQLITE_ROW) {
+        owner = sqlite3_column_int(stmt, 0);
+    }
+    sqlite3_finalize(stmt);
+    return owner;
 }

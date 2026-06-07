@@ -5,22 +5,22 @@
 
 class UserDB : public Database, public Storage {
     std::string hash_password(const std::string &password);
-    std::optional<int> get_user_id(const std::string &username);
+    
 
 public:
     using Database::Database;
 
+    std::optional<int> get_user_id(const std::string &username);
+    
     bool userExists(const std::string &username) override;
 
-    // need change just for this night
-    bool addUser(const std::string &username, const std::string &password)
-        override;
-    //
-    int addUser(
+    bool addUser(
         const std::string &username,
         const std::string &password,
         const std::string &role = "student"
     );
+    std::string getUserRole(const std::string& username) override;
+
     bool checkPassword(const std::string &username, const std::string &password)
         override;
 };

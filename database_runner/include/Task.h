@@ -6,6 +6,7 @@ struct Task {
     std::string title;
     std::string description;
     std::string difficulty;
+    int created_by = -1;
 
     Task() : id(0) {
     }

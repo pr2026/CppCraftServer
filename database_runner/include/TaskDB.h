@@ -12,15 +12,17 @@ public:
     std::vector<Task> getAllTasks() override;
     std::optional<Task> getTaskById(int id) override;
 
-    bool updateTask(int id, const Task &task) override;
-    bool deleteTask(int id) override;
+    bool updateTask(int id, const Task &task, int user_id) override;
+    bool deleteTask(int id, int user_id) override;
+
     int addTask(const Task &task) override;
     int addTask(
         const std::string &title,
         const std::string &description,
-        const std::string &difficulty = "easy"
+        const std::string &difficulty = "easy",
+        int created_by
     );
     std::vector<Test> getTestsForTask(int task_id);
-    bool
-    addTest(int task_id, const std::string &input, const std::string &expected);
+    bool addTest(int task_id, const std::string &input, const std::string &expected) override;
+    std::optional<int> getTaskOwner(int task_id);
 };
