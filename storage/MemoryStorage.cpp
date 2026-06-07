@@ -1,25 +1,35 @@
- #include "storage/MemoryStorage.h"
+#include "MemoryStorage.h"
 
-std::unordered_map<std::string, std::string> MemoryStorage::users;
+std::unordered_map<std::string, User> MemoryStorage::users;
 std::mutex MemoryStorage::m;
 
-bool MemoryStorage::userExists(const std::string& username){
+bool MemoryStorage::userExists(const std::string& username) {
     std::lock_guard<std::mutex> lock(m);
     return users.find(username) != users.end();
 }
 
-bool MemoryStorage::addUser(const std::string& username, const std::string& password){
+bool MemoryStorage::addUser(const std::string& username, const std::string& password, const std::string& role) {
     std::lock_guard<std::mutex> lock(m);
-    if (users.find(username) != users.end()){
-        return false;
-    }
-    users[username] = password;
+    if (users.find(username) != users.end()) return false;
+    User u;
+    u.id = users.size() + 1;
+    u.username = username;
+    u.password = password;
+    u.role = role;
+    users[username] = u;
     return true;
 }
 
-bool MemoryStorage::checkPassword(const std::string& username, const std::string& password){
+bool MemoryStorage::checkPassword(const std::string& username, const std::string& password) {
     std::lock_guard<std::mutex> lock(m);
-    auto x = users.find(username);
-    if (x == users.end()) return false;
-    return x -> second == password;
+    auto it = users.find(username);
+    if (it == users.end()) return false;
+    return it->second.password == password;
+}
+
+std::string MemoryStorage::getUserRole(const std::string& username) {
+    std::lock_guard<std::mutex> lock(m);
+    auto it = users.find(username);
+    if (it == users.end()) return "student";
+    return it->second.role;
 }

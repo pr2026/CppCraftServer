@@ -51,14 +51,14 @@ std::optional<Task> MemoryTaskStorage::getTaskById(int id){
     return x->second;
 }
 
-int MemoryTaskStorage::addTask(const Task& task){
-    std::lock_guard<std::mutex> lock(m);
-    int new_id = next_id++; // first we assign a value, then we increase next_id
-    Task new_task = task;
-    new_task.id = new_id;
-    tasks[new_id] = new_task;
-    return new_id;
-}
+// int MemoryTaskStorage::addTask(const Task& task){
+//     std::lock_guard<std::mutex> lock(m);
+//     int new_id = next_id++; // first we assign a value, then we increase next_id
+//     Task new_task = task;
+//     new_task.id = new_id;
+//     tasks[new_id] = new_task;
+//     return new_id;
+// }
 
 bool MemoryTaskStorage::updateTask(int id, const Task& task){
     std::lock_guard<std::mutex> lock(m);
@@ -66,7 +66,6 @@ bool MemoryTaskStorage::updateTask(int id, const Task& task){
     if (x == tasks.end()){
         return false;
     }
-    // next, we update the fields, except for the id, it does not change
     x->second.title = task.title;
     x->second.description = task.description;
     x->second.difficulty = task.difficulty;
@@ -76,4 +75,24 @@ bool MemoryTaskStorage::updateTask(int id, const Task& task){
 bool MemoryTaskStorage::deleteTask(int id){
     std::lock_guard<std::mutex> lock(m);
     return tasks.erase(id) > 0;
+}
+
+int MemoryTaskStorage::addTask(const Task& task) {
+    std::lock_guard<std::mutex> lock(m);
+    int new_id = next_id++;
+    Task newTask = task;
+    newTask.id = new_id;
+    tasks[new_id] = newTask;
+    return new_id;
+}
+
+bool MemoryTaskStorage::addTest(int taskId, const std::string& input, const std::string& expected_output){
+    std::lock_guard<std::mutex> lock(m);
+    auto it = tasks.find(taskId);
+    if (it == tasks.end()) return false;
+    TestCase tc;
+    tc.input = input;
+    tc.expected_output = expected_output;
+    it->second.tests.push_back(tc);
+    return true;
 }

@@ -2,7 +2,7 @@
 #include <filesystem>
 #include <fstream>
 #include <string>
-#include "Terminal.h"
+#include "terminal.h"
 
 inline void
 CreateTempFile(const std::string &unique_id, const std::string &code) {
@@ -53,6 +53,7 @@ run(const std::string &unique_id, const std::string &input) {
         #else
         "gcc:latest ./solution_" +
         #endif
+        "gcc:latest ./solution_" +
         unique_id;
     return terminal(run_result, input);
 }

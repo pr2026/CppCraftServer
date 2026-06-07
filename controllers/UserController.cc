@@ -1,11 +1,13 @@
 #include "UserController.h"
 #include <mutex>
 #include <unordered_map>
+#include "storage/Storage.h"
 
 void UserController::registrationUser(
     const drogon::HttpRequestPtr &req,
     std::function<void(const drogon::HttpResponsePtr &)> &&callback
 ) {
+    
     auto jsonPTR = req->getJsonObject();
     if (!jsonPTR) {
         Json::Value result;
@@ -30,6 +32,10 @@ void UserController::registrationUser(
 
     std::string username = json["username"].asString();
     std::string password = json["password"].asString();
+    std::string role = "student";
+    if (json.isMember("role") && json["role"].isString()) {
+        role = json["role"].asString();
+    }
 
     if (storage->userExists(username)) {
         Json::Value result;
@@ -41,7 +47,7 @@ void UserController::registrationUser(
         return;
     }
 
-    if (storage->addUser(username, password)) {
+    if (storage->addUser(username, password, role)) {
         Json::Value result;
         result["status"] = "OK";
         auto result_callback =
@@ -90,7 +96,7 @@ void UserController::loginUser(
     if (storage->checkPassword(username, password)) {
         Json::Value result;
         result["status"] = "OK";
-        result["role"] = "student";
+        result["role"] = storage->getUserRole(username);
         auto result_callback =
             drogon::HttpResponse::newHttpJsonResponse(result);
         callback(result_callback);
