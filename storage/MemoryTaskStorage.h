@@ -5,7 +5,7 @@
 
 class MemoryTaskStorage : public TaskStorage {
 public:
-    MemoryTaskStorage();  // constructor
+    MemoryTaskStorage();
 
     std::vector<Task> getAllTasks() override;
     std::optional<Task> getTaskById(int id) override;
@@ -17,5 +17,5 @@ public:
 private:
     std::unordered_map<int, Task> tasks;
     std::mutex m;
-    int next_id = 1;  // for generation id
+    int next_id = 1;
 };

@@ -17,9 +17,7 @@ public:
     );
     METHOD_LIST_BEGIN
     ADD_METHOD_TO(
-        UserController::registrationUser,
-        "/registration",
-        drogon::Post
+        UserController::registrationUser,"/registration", drogon::Post
     );
     ADD_METHOD_TO(UserController::loginUser, "/login", drogon::Post);
     METHOD_LIST_END

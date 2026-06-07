@@ -62,13 +62,12 @@ std::optional<Task> MemoryTaskStorage::getTaskById(int id){
 
 bool MemoryTaskStorage::updateTask(int id, const Task& task){
     std::lock_guard<std::mutex> lock(m);
-    auto x = tasks.find(id);
-    if (x == tasks.end()){
-        return false;
-    }
-    x->second.title = task.title;
-    x->second.description = task.description;
-    x->second.difficulty = task.difficulty;
+    auto it = tasks.find(id);
+    if (it == tasks.end()) return false;
+    Task updated = task;
+    updated.id = id;
+    updated.ownerId = it->second.ownerId;
+    tasks[id] = updated;
     return true;
 }
 

@@ -33,3 +33,10 @@ std::string MemoryStorage::getUserRole(const std::string& username) {
     if (it == users.end()) return "student";
     return it->second.role;
 }
+
+std::optional<User> MemoryStorage::getUserByUsername(const std::string& username) {
+    std::lock_guard<std::mutex> lock(m);
+    auto it = users.find(username);
+    if (it == users.end()) return std::nullopt;
+    return it->second;
+}

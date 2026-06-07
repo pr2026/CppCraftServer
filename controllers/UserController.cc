@@ -50,6 +50,8 @@ void UserController::registrationUser(
     if (storage->addUser(username, password, role)) {
         Json::Value result;
         result["status"] = "OK";
+        result["role"] = storage->getUserRole(username);
+        result["username"] = username;
         auto result_callback =
             drogon::HttpResponse::newHttpJsonResponse(result);
         callback(result_callback);
@@ -97,6 +99,7 @@ void UserController::loginUser(
         Json::Value result;
         result["status"] = "OK";
         result["role"] = storage->getUserRole(username);
+        result["username"] = username;
         auto result_callback =
             drogon::HttpResponse::newHttpJsonResponse(result);
         callback(result_callback);
