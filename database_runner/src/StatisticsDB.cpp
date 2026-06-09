@@ -44,8 +44,7 @@ UserStatistics StatisticsDB::getUserStatistics(int user_id) {
         while (sqlite3_step(stmt) == SQLITE_ROW) {
             TaskStatistics ts;
             ts.task_id = sqlite3_column_int(stmt, 0);
-            const char *title_ptr = (const char *)sqlite3_column_text(stmt, 1);
-            ts.task_title = title_ptr;
+            ts.task_title = (const char *)sqlite3_column_text(stmt, 1);
             ts.attempt = sqlite3_column_int(stmt, 2);
             ts.best_result = sqlite3_column_int(stmt, 3);
             ts.total_tests = sqlite3_column_int(stmt, 4);
