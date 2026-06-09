@@ -29,10 +29,6 @@ bool UserDB::userExists(const std::string &username) {
     return id.has_value();
 }
 
-
-
-
-
 bool UserDB::addUser(
     const std::string &username,
     const std::string &password,
@@ -69,8 +65,16 @@ bool UserDB::checkPassword(
     return result;
 }
 
-std::string UserDB::getUserRole(const std::string& username) {
-    auto id = get_user_id(username);
-    if (!id.has_value()) return "";
-    return "student";
+std::string UserDB::getUserRole(const std::string &username) {
+    const char *sql = "SELECT role FROM users WHERE username = ?;";
+    sqlite3_stmt *stmt;
+    std::string role = "";
+    if (sqlite3_prepare_v2(db, sql, -1, &stmt, nullptr) == SQLITE_OK) {
+        sqlite3_bind_text(stmt, 1, username.c_str(), -1, SQLITE_STATIC);
+        if (sqlite3_step(stmt) == SQLITE_ROW) {
+            role = (const char *)sqlite3_column_text(stmt, 0);
+        }
+        sqlite3_finalize(stmt);
+    }
+    return role;
 }

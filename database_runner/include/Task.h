@@ -15,11 +15,13 @@ struct Task {
         int id,
         const std::string &title,
         const std::string &description,
-        const std::string &difficulty
+        const std::string &difficulty,
+        int created_by = -1
     )
         : id(id),
           title(title),
           description(description),
-          difficulty(difficulty) {
+          difficulty(difficulty),
+          created_by(created_by) {
     }
 };
