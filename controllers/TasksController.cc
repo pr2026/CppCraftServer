@@ -105,10 +105,14 @@ void TasksController::createTask(const drogon::HttpRequestPtr& req, std::functio
     std::string description = json["description"].asString();
     std::string difficulty = json["difficulty"].asString();
 
+    auto userOpt = userStorage.getUserByUsername(username);
+    int userId = userOpt->id;
+
     Task newTask;
     newTask.title = title;
     newTask.description = description;
     newTask.difficulty = difficulty;
+    newTask.ownerId = userId;
 
     int taskId = taskStorage->addTask(newTask);
     if (taskId == -1) {
