@@ -1,32 +1,36 @@
 #pragma once
 #include <string>
-#include "RunResult.h"
-#include "Database.h"
 #include <vector>
-#include <sqlite3.h>
-#include <string>
+#include "Database.h"
 
-struct Solution {
-    int id;
-    int user_id;
-    int task_id;
-    std::string code_path;
-    Run_result result;
-    std::string created_at;
-
-    Solution() : id(0), user_id(0), task_id(0) {
-    }
+struct TaskStatistics {
+    int task_id = 0;
+    std::string task_title; 
+    int attempt = 0;
+    int best_result = 0;
+    int total_tests = 0;
+    bool is_solved = false;
 };
 
-class SolutionDB : public Database {
+struct UserStatistics {
+    int total_attempts = 0;
+    int solved_tasks = 0;
+    double avg_success_rate = 0.0;
+    std::vector<TaskStatistics> per_task;
+};
+
+struct TeacherTaskStatistics {
+    int task_id;
+    std::string title;
+    int attempted_users_count; 
+    int solved_users_count;    
+    double avg_success_rate;     
+};
+
+class StatisticsDB : public Database {
 public:
     using Database::Database;
-    bool addSolution(
-        int user_id,
-        int task_id,
-        const std::string &code_path,
-        const Run_result &result
-    );
-    std::vector<Solution> getSolutionsForUser(int user_id);
-    std::vector<Solution> getSolutionsForTask(int task_id);
+    UserStatistics getUserStatistics(int user_id);
+    std::vector<TeacherTaskStatistics> getTeacherTaskStatistics(int teacher_id);
+
 };
