@@ -42,14 +42,14 @@ UserStatistics StatisticsDB::getUserStatistics(int user_id) {
     if (sqlite3_prepare_v2(db, sql_per_task, -1, &stmt, nullptr) == SQLITE_OK) {
         sqlite3_bind_int(stmt, 1, user_id);
         while (sqlite3_step(stmt) == SQLITE_ROW) {
-            TaskStatistics ts;
-            ts.task_id = sqlite3_column_int(stmt, 0);
-            ts.task_title = (const char *)sqlite3_column_text(stmt, 1);
-            ts.attempt = sqlite3_column_int(stmt, 2);
-            ts.best_result = sqlite3_column_int(stmt, 3);
-            ts.total_tests = sqlite3_column_int(stmt, 4);
-            ts.is_solved = (ts.best_result == ts.total_tests);
-            stats.per_task.push_back(ts);
+            TaskStatistics task_stat;
+            task_stat.task_id = sqlite3_column_int(stmt, 0);
+            task_stat.task_title = (const char *)sqlite3_column_text(stmt, 1);
+            task_stat.attempt = sqlite3_column_int(stmt, 2);
+            task_stat.best_result = sqlite3_column_int(stmt, 3);
+            task_stat.total_tests = sqlite3_column_int(stmt, 4);
+            task_stat.is_solved = (task_stat.best_result == task_stat.total_tests);
+            stats.per_task.push_back(task_stat);
         }
     }
     sqlite3_finalize(stmt);
