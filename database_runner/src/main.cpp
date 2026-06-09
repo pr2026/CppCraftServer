@@ -102,28 +102,4 @@ int main() {
             std::cout << "done";
         }
         std::cout << std::endl;
-    }
-    // ===== СТАТИСТИКА ПОЛЬЗОВАТЕЛЯ =====
     
-    UserStatistics stats = stat_db.getUserStatistics(user_id);
-    std::cout << "\n=== СТАТИСТИКА ПОЛЬЗОВАТЕЛЯ ===\n";
-    std::cout << "Всего попыток: " << stats.total_attempts << std::endl;
-    std::cout << "Решено задач: " << stats.solved_tasks << std::endl;
-    std::cout << "Средний успех: " << stats.avg_success_rate << "%" << std::endl;
-
-    if (!stats.per_task.empty()) {
-        std::cout << "\nИнформация по задачам:\n";
-        for (const auto& task : stats.per_task) {
-            std::cout << "  Задача " << task.task_id;
-            if (!task.task_title.empty()) {
-                std::cout << " (\"" << task.task_title << "\")";
-            }
-            std::cout << ": " << task.attempt << " попыток, "
-                      << "лучший результат " << task.best_result << "/" << task.total_tests;
-            if (task.is_solved) {
-                std::cout << " ✅";
-            }
-            std::cout << std::endl;
-        }
-    }
-}
