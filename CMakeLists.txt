@@ -49,10 +49,11 @@ aux_source_directory(storage STORAGE_SRC)
 
 set(RUNNER_DIR ${CMAKE_CURRENT_SOURCE_DIR}/database_runner)
 set(RUNNER_SRC
-    ${RUNNER_DIR}/src/database.cpp
-    ${RUNNER_DIR}/src/error.cpp
+    ${RUNNER_DIR}/src/Database.cpp
+    ${RUNNER_DIR}/src/Error.cpp
     ${RUNNER_DIR}/src/run_student_code.cpp
-    ${RUNNER_DIR}/src/terminal.cpp
+    ${RUNNER_DIR}/src/Terminal.cpp
+    ${RUNNER_DIR}/src/StatisticsDB.cpp
 )
 
 drogon_create_views(${PROJECT_NAME} ${CMAKE_CURRENT_SOURCE_DIR}/views

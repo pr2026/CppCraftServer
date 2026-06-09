@@ -15,7 +15,7 @@ struct TaskStatistics {
 struct UserStatistics {
     int total_attempts = 0;
     int solved_tasks = 0;
-    double avg_success_rate = 0.0;
+    double avg_success_rate = 0.0;   
     std::vector<TaskStatistics> per_task;
 };
 
