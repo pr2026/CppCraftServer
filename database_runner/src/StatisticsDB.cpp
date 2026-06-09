@@ -10,7 +10,7 @@ UserStatistics StatisticsDB::getUserStatistics(int user_id) {
         "SUM(CASE WHEN passed_tests = total_tests THEN 1 ELSE 0 END) as solved "
         "FROM solutions WHERE user_id = ?;";
 
-    if (sqlite3_prepare_v2(db, sql_total, -1, &stmt, nullptr) == SQLITE_OK) {
+    if (sqlite3_prepare_v2(db, sql_total.c_str(), -1, &stmt, nullptr) == SQLITE_OK) {
         sqlite3_bind_int(stmt, 1, user_id);
         if (sqlite3_step(stmt) == SQLITE_ROW) {
             stats.total_attempts = sqlite3_column_int(stmt, 0);
@@ -22,7 +22,7 @@ UserStatistics StatisticsDB::getUserStatistics(int user_id) {
     std::string sql_avg =
         "SELECT AVG(CAST(passed_tests AS REAL) / total_tests) * 100 "
         "FROM solutions WHERE user_id = ?;";
-    if (sqlite3_prepare_v2(db, sql_avg, -1, &stmt, nullptr) == SQLITE_OK) {
+    if (sqlite3_prepare_v2(db, sql_avg.c_str(), -1, &stmt, nullptr) == SQLITE_OK) {
         sqlite3_bind_int(stmt, 1, user_id);
         if (sqlite3_step(stmt) == SQLITE_ROW) {
             stats.avg_success_rate = sqlite3_column_double(stmt, 0);
@@ -39,7 +39,7 @@ UserStatistics StatisticsDB::getUserStatistics(int user_id) {
         "WHERE s.user_id = ? "
         "GROUP BY s.task_id;";
 
-    if (sqlite3_prepare_v2(db, sql_per_task, -1, &stmt, nullptr) == SQLITE_OK) {
+    if (sqlite3_prepare_v2(db, sql_per_task.c_str(), -1, &stmt, nullptr) == SQLITE_OK) {
         sqlite3_bind_int(stmt, 1, user_id);
         while (sqlite3_step(stmt) == SQLITE_ROW) {
             TaskStatistics task_stat;
@@ -56,10 +56,10 @@ UserStatistics StatisticsDB::getUserStatistics(int user_id) {
     return stats;
 }
 
-std::vector<TeacherTaskStats> StatisticsDB::getTeacherTaskStatistics(
+std::vector<TeacherTaskStatistics> StatisticsDB::getTeacherTaskStatistics(
     int teacher_id
 ) {
-    std::vector<TeacherTaskStats> results;
+    std::vector<TeacherTaskStatistics> results;
     sqlite3_stmt *stmt;
 
     const char *sql =
@@ -77,12 +77,12 @@ std::vector<TeacherTaskStats> StatisticsDB::getTeacherTaskStatistics(
         sqlite3_bind_int(stmt, 1, teacher_id);
 
         while (sqlite3_step(stmt) == SQLITE_ROW) {
-            TeacherTaskStats row;
+            TeacherTaskStatistics row;
             row.task_id = sqlite3_column_int(stmt, 0);
             row.title = ((const char *)sqlite3_column_text(stmt, 1));
             row.attempted_users_count = sqlite3_column_int(stmt, 2);
             row.solved_users_count = sqlite3_column_int(stmt, 3);
-            row.success_rate = sqlite3_column_double(stmt, 4);
+            row.avg_success_rate = sqlite3_column_double(stmt, 4);
             results.push_back(row);
         }
     }
