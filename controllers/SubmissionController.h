@@ -4,6 +4,8 @@
 #include "database_runner/include/run_student_code.h"
 #include "storage/SubmissionStorage.h"
 #include "storage/TaskStorage.h"
+#include "TaskDB.h"
+#include "SolutionDB.h"
 
 class SubmissionController
     : public drogon::HttpController<SubmissionController> {
@@ -33,6 +35,6 @@ public:
     METHOD_LIST_END
 
 private:
-    std::unique_ptr<TaskStorage> taskStorage;
-    std::unique_ptr<SubmissionStorage> submissionStorage;
+    std::unique_ptr<TaskDB> taskStorage;
+    std::unique_ptr<SolutionDB> submissionStorage;
 };
