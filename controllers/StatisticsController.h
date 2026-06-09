@@ -8,5 +8,6 @@ public:
 
     METHOD_LIST_BEGIN
     ADD_METHOD_TO(StatisticsController::getUserStatistics, "/students/{user_id}/statistics", drogon::Get);
+    ADD_METHOD_TO(StatisticsController::getTeacherStatistics, "/teachers/{teacher_id}/tasks-statistics", drogon::Get);
     METHOD_LIST_END
 };

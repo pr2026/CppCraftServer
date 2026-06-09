@@ -1,4 +1,5 @@
 #include "TasksController.h"
+#include "UserDB.h"
 #include "storage/MemoryStorage.h"
 
 void TasksController::getTasks(
@@ -82,7 +83,7 @@ void TasksController::createTask(const drogon::HttpRequestPtr& req, std::functio
     }
     std::string username = json["username"].asString();
 
-    MemoryStorage userStorage;
+    UserDB userStorage("cppcraft.db");
     std::string role = userStorage.getUserRole(username);
     if (role != "teacher") {
         Json::Value ret;
@@ -105,8 +106,11 @@ void TasksController::createTask(const drogon::HttpRequestPtr& req, std::functio
     std::string description = json["description"].asString();
     std::string difficulty = json["difficulty"].asString();
 
-    auto userOpt = userStorage.getUserByUsername(username);
-    int userId = userOpt->id;
+    //auto userOpt = userStorage.getUserByUsername(username);
+    //int userId = userOpt->id;
+
+    auto userIdOpt = userStorage.get_user_id(username);
+    int userId = userIdOpt.value();
 
     Task newTask;
     newTask.title = title;
@@ -191,7 +195,7 @@ void TasksController::deleteTask(const drogon::HttpRequestPtr &req,
     }
     std::string username = json["username"].asString();
 
-    MemoryStorage userStorage;
+    UserDB userStorage("cppcraft.db");
     std::string role = userStorage.getUserRole(username);
     if (role != "teacher") {
         Json::Value ret;
@@ -243,25 +247,28 @@ void TasksController::updateTask(const drogon::HttpRequestPtr& req,
     }
     std::string username = json["username"].asString();
 
-    MemoryStorage userStorage;
-    auto userOpt = userStorage.getUserByUsername(username);
-    if (!userOpt.has_value()) {
-        Json::Value ret;
-        ret["error"] = "User not found";
-        auto resp = drogon::HttpResponse::newHttpJsonResponse(ret);
-        resp->setStatusCode(drogon::k404NotFound);
-        callback(resp);
-        return;
-    }
-    if (userOpt->role != "teacher") {
-        Json::Value ret;
-        ret["error"] = "Access denied. Only teachers can update tasks";
-        auto resp = drogon::HttpResponse::newHttpJsonResponse(ret);
-        resp->setStatusCode(drogon::k403Forbidden);
-        callback(resp);
-        return;
-    }
-    int currentUserId = userOpt->id;
+    UserDB userStorage("cppcraft.db");
+    // auto userOpt = userStorage.getUserByUsername(username);
+    // if (!userOpt.has_value()) {
+    //     Json::Value ret;
+    //     ret["error"] = "User not found";
+    //     auto resp = drogon::HttpResponse::newHttpJsonResponse(ret);
+    //     resp->setStatusCode(drogon::k404NotFound);
+    //     callback(resp);
+    //     return;
+    // }
+    // if (userOpt->role != "teacher") {
+    //     Json::Value ret;
+    //     ret["error"] = "Access denied. Only teachers can update tasks";
+    //     auto resp = drogon::HttpResponse::newHttpJsonResponse(ret);
+    //     resp->setStatusCode(drogon::k403Forbidden);
+    //     callback(resp);
+    //     return;
+    // }
+    // int currentUserId = userOpt->id;
+
+    auto userIdOpt = userStorage.get_user_id(username);
+    int currentUserId = userIdOpt.value();
 
     auto taskOpt = taskStorage->getTaskById(taskId);
     if (!taskOpt.has_value()) {
@@ -273,14 +280,14 @@ void TasksController::updateTask(const drogon::HttpRequestPtr& req,
         return;
     }
     const auto& existingTask = taskOpt.value();
-    if (existingTask.ownerId != currentUserId) {
-        Json::Value ret;
-        ret["error"] = "Access denied. You are not the owner of this task";
-        auto resp = drogon::HttpResponse::newHttpJsonResponse(ret);
-        resp->setStatusCode(drogon::k403Forbidden);
-        callback(resp);
-        return;
-    }
+    // if (existingTask.ownerId != currentUserId) {
+    //     Json::Value ret;
+    //     ret["error"] = "Access denied. You are not the owner of this task";
+    //     auto resp = drogon::HttpResponse::newHttpJsonResponse(ret);
+    //     resp->setStatusCode(drogon::k403Forbidden);
+    //     callback(resp);
+    //     return;
+    // }
 
     if (!json.isMember("title") || !json.isMember("description") || !json.isMember("difficulty")) {
         Json::Value ret;

@@ -25,3 +25,28 @@ void StatisticsController::getUserStatistics(const drogon::HttpRequestPtr& req, 
     auto resp = drogon::HttpResponse::newHttpJsonResponse(ret);
     callback(resp);
 }
+
+#include "StatisticsController.h"
+#include "StatisticsDB.h"
+#include <drogon/drogon.h>
+
+void StatisticsController::getTeacherStatistics(const drogon::HttpRequestPtr& req,
+                                                std::function<void(const drogon::HttpResponsePtr&)>&& callback,
+                                                int teacherId) {
+    StatisticsDB db("cppcraft.db");
+    std::vector<TeacherTaskStatistics> stats = db.getTeacherTaskStatistics(teacherId);
+
+    Json::Value result(Json::arrayValue);
+    for (const auto& task : stats) {
+        Json::Value item;
+        item["task_id"] = task.task_id;
+        item["title"] = task.title;
+        item["attempted_users_count"] = task.attempted_users_count;
+        item["solved_users_count"] = task.solved_users_count;
+        item["avg_success_rate"] = task.avg_success_rate;
+        result.append(item);
+    }
+
+    auto resp = drogon::HttpResponse::newHttpJsonResponse(result);
+    callback(resp);
+}
