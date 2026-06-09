@@ -19,8 +19,18 @@ struct UserStatistics {
     std::vector<TaskStatistics> per_task;
 };
 
+struct TeacherTaskStatistics {
+    int task_id;
+    std::string title;
+    int attempted_users_count; 
+    int solved_users_count;    
+    double avg_success_rate;     
+};
+
 class StatisticsDB : public Database {
 public:
     using Database::Database;
     UserStatistics getUserStatistics(int user_id);
+    std::vector<TeacherTaskStatistics> getTeacherTaskStatistics(int teacher_id);
+
 };
