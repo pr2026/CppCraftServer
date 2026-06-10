@@ -1,11 +1,11 @@
 #pragma once
 #include <drogon/drogon.h>
 #include <memory>
-#include "storage/MemoryStorage.h"
+#include "UserDB.h"
 
 class UserController : public drogon::HttpController<UserController> {
 public:
-    UserController() : storage(std::make_unique<MemoryStorage>()){};
+    UserController() : storage(std::make_unique<UserDB>("cppcraft.db")){};
 
     void registrationUser(
         const drogon::HttpRequestPtr &req,
@@ -23,5 +23,5 @@ public:
     METHOD_LIST_END
 
 private:
-    std::unique_ptr<Storage> storage;
+    std::unique_ptr<UserDB> storage;
 };

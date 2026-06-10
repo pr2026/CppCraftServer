@@ -17,7 +17,7 @@ public:
     bool addUser(
         const std::string &username,
         const std::string &password,
-        const std::string &role = "student"
+        const std::string &role
     ) override;
     std::string getUserRole(const std::string& username) override;
 

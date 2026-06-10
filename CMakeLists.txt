@@ -54,6 +54,7 @@ set(RUNNER_SRC
     ${RUNNER_DIR}/src/run_student_code.cpp
     ${RUNNER_DIR}/src/Terminal.cpp
     ${RUNNER_DIR}/src/StatisticsDB.cpp
+    ${RUNNER_DIR}/src/UserDB.cpp
 )
 
 drogon_create_views(${PROJECT_NAME} ${CMAKE_CURRENT_SOURCE_DIR}/views

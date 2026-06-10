@@ -3,10 +3,11 @@
 #include <memory>
 #include "storage/MemoryTaskStorage.h"
 #include "storage/TaskStorage.h"
+#include "TaskDB.h"
 
 class TasksController : public drogon::HttpController<TasksController> {
 public:
-    TasksController() : taskStorage(std::make_unique<MemoryTaskStorage>()) {
+    TasksController() : taskStorage(std::make_unique<TaskDB>("cppcraft.db")) {
     }
 
     void getTasks(
@@ -39,5 +40,5 @@ public:
     METHOD_LIST_END
 
 private:
-    std::unique_ptr<TaskStorage> taskStorage;
+    std::unique_ptr<TaskDB> taskStorage;
 };
