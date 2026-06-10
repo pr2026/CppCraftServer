@@ -17,10 +17,7 @@ int main() {
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             title TEXT NOT NULL,
             description TEXT,
-            difficulty TEXT DEFAULT 'easy',
-            created_by INTEGER NOT NULL,
-            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-            FOREIGN KEY (created_by) REFERENCES users(id)
+            difficulty TEXT DEFAULT 'easy'
         );
     )");
 
