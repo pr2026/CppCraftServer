@@ -3,20 +3,32 @@
 int TaskDB::addTask(
     const std::string &title,
     const std::string &description,
-    const std::string &difficulty,
-    int created_by
+    const std::string &difficulty
 ) {
-    std::string sql =
-        "INSERT INTO tasks (title, description, difficulty, created_by) VALUES ('" + title +
-        "', '" + description + "', '" + difficulty + "', " + std::to_string(created_by)+ "');";
-    if (!execute_SQL(sql)) {
+    const char* sql = "INSERT INTO tasks (title, description, difficulty) VALUES (?, ?, ?);";
+    sqlite3_stmt* stmt;
+    if (sqlite3_prepare_v2(db, sql, -1, &stmt, nullptr) != SQLITE_OK) {
         return -1;
     }
-    return last_insert_row_id();
+    
+    sqlite3_bind_text(stmt, 1, title.c_str(), -1, SQLITE_STATIC);
+    sqlite3_bind_text(stmt, 2, description.c_str(), -1, SQLITE_STATIC);
+    sqlite3_bind_text(stmt, 3, difficulty.c_str(), -1, SQLITE_STATIC);
+    
+    
+    if (sqlite3_step(stmt) != SQLITE_DONE) {
+        sqlite3_finalize(stmt);
+        return -1;
+    }
+    
+    int task_id = sqlite3_last_insert_rowid(db);
+    sqlite3_finalize(stmt);
+    return task_id;
+
 }
 
 int TaskDB::addTask(const Task &task) {
-    return addTask(task.title, task.description, task.difficulty, task.created_by);
+    return addTask(task.title, task.description, task.difficulty);
 }
 
 std::vector<Task> TaskDB::getAllTasks() {
@@ -63,26 +75,36 @@ std::optional<Task> TaskDB::getTaskById(int id) {
     return result;
 }
 
-bool TaskDB::updateTask(int id, const Task &task, int user_id) {
-    auto owner = getTaskOwner(id);
-    if (!owner.has_value() || owner.value() != user_id) {
-        return false; 
-    }
-    std::string sql = "UPDATE tasks SET title = '" + task.title +
-                      "', description = '" + task.description +
-                      "', difficulty = '" + task.difficulty +
-                      "' WHERE id = " + std::to_string(id) + ";";
-    return execute_SQL(sql);
-}
-
-bool TaskDB::deleteTask(int id, int user_id) {
-    auto owner = getTaskOwner(id);
-    if (!owner.has_value() || owner.value() != user_id) {
+bool TaskDB::updateTask(int id, const Task &task) {
+    const char* sql = "UPDATE tasks SET title = ?, description = ?, difficulty = ? WHERE id = ?;";
+    sqlite3_stmt* stmt;
+    
+    if (sqlite3_prepare_v2(db, sql, -1, &stmt, nullptr) != SQLITE_OK) {
         return false;
     }
-    std::string sql =
-        "DELETE FROM tasks WHERE id = " + std::to_string(id) + ";";
-    return execute_SQL(sql);
+    
+    sqlite3_bind_text(stmt, 1, task.title.c_str(), -1, SQLITE_STATIC);
+    sqlite3_bind_text(stmt, 2, task.description.c_str(), -1, SQLITE_STATIC);
+    sqlite3_bind_text(stmt, 3, task.difficulty.c_str(), -1, SQLITE_STATIC);
+    sqlite3_bind_int(stmt, 4, id);
+
+    bool res = (sqlite3_step(stmt) == SQLITE_DONE);  
+    sqlite3_finalize(stmt);                              
+    return res;
+}
+
+bool TaskDB::deleteTask(int id) {
+    const char* sql = "DELETE FROM tasks WHERE id = ?;";
+    sqlite3_stmt* stmt;
+    
+    if (sqlite3_prepare_v2(db, sql, -1, &stmt, nullptr) != SQLITE_OK) {
+        return false;
+    }
+    
+    sqlite3_bind_int(stmt, 1, id);
+    bool res = (sqlite3_step(stmt) == SQLITE_DONE);  
+    sqlite3_finalize(stmt);                             
+    return res;
 }
 
 bool TaskDB::addTest(
@@ -90,11 +112,22 @@ bool TaskDB::addTest(
     const std::string &input,
     const std::string &expected
 ) {
-    std::string sql =
-        "INSERT INTO tests (task_id, input, expected_output) VALUES (" +
-        std::to_string(task_id) + ", '" + input + "', '" + expected + "');";
+    const char* sql = "INSERT INTO tests (task_id, input, expected_output) VALUES (?, ?, ?);";
 
-    return execute_SQL(sql);
+    sqlite3_stmt* stmt;
+    
+    if (sqlite3_prepare_v2(db, sql, -1, &stmt, nullptr) != SQLITE_OK) {
+        return false;
+    }
+    
+    sqlite3_bind_int(stmt, 1, task_id);
+    sqlite3_bind_text(stmt, 2, input.c_str(), -1, SQLITE_STATIC);
+    sqlite3_bind_text(stmt, 3, expected.c_str(), -1, SQLITE_STATIC);
+    
+    bool done = (sqlite3_step(stmt) == SQLITE_DONE);
+    sqlite3_finalize(stmt);
+    return done;
+
 }
 
 std::vector<Test> TaskDB::getTestsForTask(int task_id) {
@@ -121,16 +154,4 @@ std::vector<Test> TaskDB::getTestsForTask(int task_id) {
     sqlite3_finalize(stmt);
     return tests;
 }
-std::optional<int> TaskDB::getTaskOwner(int task_id) {
-    std::string sql = "SELECT created_by FROM tasks WHERE id = " + std::to_string(task_id) + ";";
-    sqlite3_stmt* stmt;
-    if (sqlite3_prepare_v2(db, sql.c_str(), -1, &stmt, nullptr) != SQLITE_OK) {
-        return std::nullopt;
-    }
-    std::optional<int> owner = std::nullopt;
-    if (sqlite3_step(stmt) == SQLITE_ROW) {
-        owner = sqlite3_column_int(stmt, 0);
-    }
-    sqlite3_finalize(stmt);
-    return owner;
-}
+
