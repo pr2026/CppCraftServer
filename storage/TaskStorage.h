@@ -27,7 +27,7 @@ public:
     virtual std::vector<Task> getAllTasks() = 0;
     virtual std::optional<Task> getTaskById(int id) = 0;
     virtual int addTask(const Task &task) = 0;
-    virtual bool updateTask(int id, const Task &task) = 0;
-    virtual bool deleteTask(int id) = 0;
+    virtual bool updateTask(int id, const Task &task, int user_id) = 0;
+    virtual bool deleteTask(int id, int user_id) = 0;
     virtual bool addTest(int id, const std::string& input, const std::string& expected_outpu) = 0;
 };

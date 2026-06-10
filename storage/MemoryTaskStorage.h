@@ -9,8 +9,8 @@ public:
 
     std::vector<Task> getAllTasks() override;
     std::optional<Task> getTaskById(int id) override;
-    bool updateTask(int id, const Task &task) override;
-    bool deleteTask(int id) override;
+    bool updateTask(int id, const Task &task, int user_id) override;
+    bool deleteTask(int id, int user_id) override;
     int addTask(const Task& task);
     bool addTest(int taskId, const std::string& input, const std::string& expected_output);
 

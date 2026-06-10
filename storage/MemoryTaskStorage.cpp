@@ -60,7 +60,7 @@ std::optional<Task> MemoryTaskStorage::getTaskById(int id){
 //     return new_id;
 // }
 
-bool MemoryTaskStorage::updateTask(int id, const Task& task){
+bool MemoryTaskStorage::updateTask(int id, const Task &task, int user_id){
     std::lock_guard<std::mutex> lock(m);
     auto it = tasks.find(id);
     if (it == tasks.end()) return false;
@@ -71,7 +71,7 @@ bool MemoryTaskStorage::updateTask(int id, const Task& task){
     return true;
 }
 
-bool MemoryTaskStorage::deleteTask(int id){
+bool MemoryTaskStorage::deleteTask(int id, int user_id){
     std::lock_guard<std::mutex> lock(m);
     return tasks.erase(id) > 0;
 }

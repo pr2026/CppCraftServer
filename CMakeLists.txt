@@ -54,6 +54,8 @@ set(RUNNER_SRC
     ${RUNNER_DIR}/src/run_student_code.cpp
     ${RUNNER_DIR}/src/Terminal.cpp
     ${RUNNER_DIR}/src/StatisticsDB.cpp
+    ${RUNNER_DIR}/src/UserDB.cpp
+    ${RUNNER_DIR}/src/TaskDB.cpp
 )
 
 drogon_create_views(${PROJECT_NAME} ${CMAKE_CURRENT_SOURCE_DIR}/views
@@ -79,8 +81,6 @@ target_sources(${PROJECT_NAME}
                ${MODEL_SRC}
                ${STORAGE_SRC} 
                ${RUNNER_SRC}
-               storage/MemoryStorage.cpp
-               storage/MemoryTaskStorage.cpp
                storage/MemorySubmissionStorage.cpp)
 # ##############################################################################
 # uncomment the following line for dynamically loading views 

@@ -52,8 +52,11 @@ void UserController::registrationUser(
         result["status"] = "OK";
         result["role"] = storage->getUserRole(username);
         result["username"] = username;
-        auto result_callback =
-            drogon::HttpResponse::newHttpJsonResponse(result);
+        auto userIdOpt = storage->get_user_id(username);
+        if (userIdOpt.has_value()) {
+            result["userId"] = *userIdOpt;
+        }
+        auto result_callback = drogon::HttpResponse::newHttpJsonResponse(result);
         callback(result_callback);
 
     } else {
@@ -100,6 +103,10 @@ void UserController::loginUser(
         result["status"] = "OK";
         result["role"] = storage->getUserRole(username);
         result["username"] = username;
+        auto userIdOpt = storage->get_user_id(username);
+        if (userIdOpt.has_value()) {
+            result["userId"] = *userIdOpt;
+        }
         auto result_callback =
             drogon::HttpResponse::newHttpJsonResponse(result);
         callback(result_callback);

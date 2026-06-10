@@ -19,8 +19,8 @@ public:
     int addTask(
         const std::string &title,
         const std::string &description,
-        const std::string &difficulty = "easy",
-        int created_by
+        int created_by,
+        const std::string &difficulty = "easy"
     );
     std::vector<Test> getTestsForTask(int task_id);
     bool addTest(int task_id, const std::string &input, const std::string &expected) override;

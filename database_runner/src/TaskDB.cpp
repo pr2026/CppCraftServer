@@ -3,20 +3,33 @@
 int TaskDB::addTask(
     const std::string &title,
     const std::string &description,
-    const std::string &difficulty,
-    int created_by
+    int created_by,
+    const std::string &difficulty
 ) {
-    std::string sql =
-        "INSERT INTO tasks (title, description, difficulty, created_by) VALUES ('" + title +
-        "', '" + description + "', '" + difficulty + "', " + std::to_string(created_by)+ "');";
-    if (!execute_SQL(sql)) {
+    const char* sql = "INSERT INTO tasks (title, description, difficulty, created_by) VALUES (?, ?, ?, ?);";
+    sqlite3_stmt* stmt;
+    if (sqlite3_prepare_v2(db, sql, -1, &stmt, nullptr) != SQLITE_OK) {
         return -1;
     }
-    return last_insert_row_id();
+    
+    sqlite3_bind_text(stmt, 1, title.c_str(), -1, SQLITE_STATIC);
+    sqlite3_bind_text(stmt, 2, description.c_str(), -1, SQLITE_STATIC);
+    sqlite3_bind_text(stmt, 3, difficulty.c_str(), -1, SQLITE_STATIC);
+    sqlite3_bind_int(stmt, 4, created_by);
+    
+    if (sqlite3_step(stmt) != SQLITE_DONE) {
+        sqlite3_finalize(stmt);
+        return -1;
+    }
+    
+    int task_id = sqlite3_last_insert_rowid(db);
+    sqlite3_finalize(stmt);
+    return task_id;
+
 }
 
 int TaskDB::addTask(const Task &task) {
-    return addTask(task.title, task.description, task.difficulty, task.created_by);
+    return addTask(task.title, task.description, task.ownerId, task.difficulty);
 }
 
 std::vector<Task> TaskDB::getAllTasks() {
@@ -90,11 +103,22 @@ bool TaskDB::addTest(
     const std::string &input,
     const std::string &expected
 ) {
-    std::string sql =
-        "INSERT INTO tests (task_id, input, expected_output) VALUES (" +
-        std::to_string(task_id) + ", '" + input + "', '" + expected + "');";
+    const char* sql = "INSERT INTO tests (task_id, input, expected_output) VALUES (?, ?, ?);";
 
-    return execute_SQL(sql);
+    sqlite3_stmt* stmt;
+    
+    if (sqlite3_prepare_v2(db, sql, -1, &stmt, nullptr) != SQLITE_OK) {
+        return false;
+    }
+    
+    sqlite3_bind_int(stmt, 1, task_id);
+    sqlite3_bind_text(stmt, 2, input.c_str(), -1, SQLITE_STATIC);
+    sqlite3_bind_text(stmt, 3, expected.c_str(), -1, SQLITE_STATIC);
+    
+    bool done = (sqlite3_step(stmt) == SQLITE_DONE);
+    sqlite3_finalize(stmt);
+    return done;
+
 }
 
 std::vector<Test> TaskDB::getTestsForTask(int task_id) {

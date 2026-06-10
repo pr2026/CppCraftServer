@@ -9,7 +9,7 @@ class UserDB : public Database, public Storage {
 
 public:
     using Database::Database;
-
+ 
     std::optional<int> get_user_id(const std::string &username);
     
     bool userExists(const std::string &username) override;

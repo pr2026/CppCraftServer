@@ -1,5 +1,5 @@
 #include "TasksController.h"
-#include "storage/MemoryStorage.h"
+#include "UserDB.h"
 
 void TasksController::getTasks(
     const drogon::HttpRequestPtr &req,
@@ -82,7 +82,19 @@ void TasksController::createTask(const drogon::HttpRequestPtr& req, std::functio
     }
     std::string username = json["username"].asString();
 
-    MemoryStorage userStorage;
+    UserDB userStorage("cppcraft.db");
+
+    auto userIdOpt = userStorage.get_user_id(username);
+    if (!userIdOpt.has_value()) {
+        Json::Value ret;
+        ret["error"] = "User not found";
+        auto resp = drogon::HttpResponse::newHttpJsonResponse(ret);
+        resp->setStatusCode(drogon::k404NotFound);
+        callback(resp);
+        return;
+    }
+    int teacherId = userIdOpt.value();
+    
     std::string role = userStorage.getUserRole(username);
     if (role != "teacher") {
         Json::Value ret;
@@ -109,6 +121,7 @@ void TasksController::createTask(const drogon::HttpRequestPtr& req, std::functio
     newTask.title = title;
     newTask.description = description;
     newTask.difficulty = difficulty;
+    newTask.ownerId = teacherId;
 
     int taskId = taskStorage->addTask(newTask);
     if (taskId == -1) {
@@ -187,7 +200,7 @@ void TasksController::deleteTask(const drogon::HttpRequestPtr &req,
     }
     std::string username = json["username"].asString();
 
-    MemoryStorage userStorage;
+    UserDB userStorage("cppcraft.db");
     std::string role = userStorage.getUserRole(username);
     if (role != "teacher") {
         Json::Value ret;
@@ -197,8 +210,19 @@ void TasksController::deleteTask(const drogon::HttpRequestPtr &req,
         callback(resp);
         return;
     }
+    auto userIdOpt = userStorage.get_user_id(username);
+    if (!userIdOpt.has_value()) {
+        Json::Value ret;
+        ret["error"] = "User not found";
+        auto resp = drogon::HttpResponse::newHttpJsonResponse(ret);
+        resp->setStatusCode(drogon::k404NotFound);
+        callback(resp);
+        return;
+    }
+    int currentUserId = userIdOpt.value();
 
-    bool deleted = taskStorage->deleteTask(taskId);
+    bool deleted = taskStorage->deleteTask(taskId, currentUserId);
+
     if (!deleted){
         Json::Value ret;
         ret["error"] = "Task not found";
@@ -239,9 +263,9 @@ void TasksController::updateTask(const drogon::HttpRequestPtr& req,
     }
     std::string username = json["username"].asString();
 
-    MemoryStorage userStorage;
-    auto userOpt = userStorage.getUserByUsername(username);
-    if (!userOpt.has_value()) {
+    UserDB userStorage("cppcraft.db");
+    auto userIdOpt = userStorage.get_user_id(username);
+    if (!userIdOpt.has_value()) {
         Json::Value ret;
         ret["error"] = "User not found";
         auto resp = drogon::HttpResponse::newHttpJsonResponse(ret);
@@ -249,7 +273,10 @@ void TasksController::updateTask(const drogon::HttpRequestPtr& req,
         callback(resp);
         return;
     }
-    if (userOpt->role != "teacher") {
+
+    int currentUserId = userIdOpt.value();
+    std::string role = userStorage.getUserRole(username);
+    if (role != "teacher") {
         Json::Value ret;
         ret["error"] = "Access denied. Only teachers can update tasks";
         auto resp = drogon::HttpResponse::newHttpJsonResponse(ret);
@@ -257,7 +284,6 @@ void TasksController::updateTask(const drogon::HttpRequestPtr& req,
         callback(resp);
         return;
     }
-    int currentUserId = userOpt->id;
 
     auto taskOpt = taskStorage->getTaskById(taskId);
     if (!taskOpt.has_value()) {
@@ -307,7 +333,7 @@ void TasksController::updateTask(const drogon::HttpRequestPtr& req,
     } 
     else updatedTask.tests = existingTask.tests;
 
-    if (!taskStorage->updateTask(taskId, updatedTask)) {
+    if (!taskStorage->updateTask(taskId, updatedTask, currentUserId)) {
         Json::Value ret;
         ret["error"] = "Failed to update task";
         auto resp = drogon::HttpResponse::newHttpJsonResponse(ret);
